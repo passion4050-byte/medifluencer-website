@@ -1,4 +1,4 @@
-/* Medifluencer - main.js (safe mode v2) */
+/* Medifluencer - main.js (safe mode v3) */
 (function () {
   'use strict';
   const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -21,14 +21,14 @@
     document.querySelectorAll('.lang-btn').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
   }
 
-  // ---- Header ----
+  // ---- Sticky header scrolled state ----
   function initHeader(){
     const h = document.querySelector('.site-header'); if(!h) return;
     const up=()=>h.classList.toggle('scrolled', window.scrollY>8);
     window.addEventListener('scroll',up,{passive:true}); up();
   }
 
-  // ---- Menu ----
+  // ---- Mobile menu ----
   function initMenu(){
     const t = document.querySelector('.menu-toggle');
     const n = document.querySelector('.nav-main');
@@ -37,7 +37,7 @@
     n.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{t.classList.remove('open');n.classList.remove('open');}));
   }
 
-  // ---- Auto stagger ----
+  // ---- Auto-stagger: add .stagger class + data-reveal to grid containers ----
   function initAutoStagger(){
     const sel = '.stages, .pillars, .value-grid, .ctype-grid, .bmodel-grid, .tier-grid, .cases, .diag-grid, .kpi-roadmap, .trust-grid, .track-row, .process';
     document.querySelectorAll(sel).forEach(g=>{
@@ -46,11 +46,10 @@
     });
   }
 
-  // ---- Reveal (safe: content visible by default, animation on enter) ----
+  // ---- Reveal (SAFE: content visible by default, animation is decoration only) ----
   function initReveal(){
     const els = document.querySelectorAll('[data-reveal]');
     if (!els.length) return;
-    // If IO unavailable: just mark all as visible (animation skipped)
     if (!('IntersectionObserver' in window)){
       els.forEach(e=>e.classList.add('in'));
       return;
@@ -65,18 +64,16 @@
     },{threshold:0.04, rootMargin:'0px 0px -30px 0px'});
     els.forEach(e=>obs.observe(e));
 
-    // Hero & page-hero & product-hero items - mark as visible immediately on load
-    document.querySelectorAll('.hero [data-reveal], .page-hero [data-reveal], .product-hero [data-reveal]').forEach(el=>{
-      el.classList.add('in');
-    });
+    // Hero/page-hero/product-hero items become .in immediately on load
+    document.querySelectorAll('.hero [data-reveal], .page-hero [data-reveal], .product-hero [data-reveal]').forEach(el=>el.classList.add('in'));
 
-    // Safety net: after 800ms, any [data-reveal] that hasn\'t been activated yet is shown
+    // 800ms safety net — any [data-reveal] still not .in is forced visible
     setTimeout(()=>{
       document.querySelectorAll('[data-reveal]:not(.in)').forEach(el=>el.classList.add('in'));
     }, 800);
   }
 
-  // ---- Counter ----
+  // ---- Counter animation ----
   function animateNum(el){
     const tg = parseFloat(el.dataset.count); if (isNaN(tg)) return;
     const dur=1400, start=performance.now(), fmt=el.dataset.fmt||'int';
@@ -97,11 +94,11 @@
       entries.forEach(e=>{ if(e.isIntersecting){ animateNum(e.target); obs.unobserve(e.target); }});
     },{threshold:0.3});
     ns.forEach(n=>obs.observe(n));
-    // Hero counters - run immediately
+    // Hero counters fire immediately
     document.querySelectorAll('.hero [data-count], .product-hero [data-count]').forEach(n=>{ animateNum(n); obs.unobserve(n); });
   }
 
-  // ---- Form (Supabase insert) ----
+  // ---- Contact form (Supabase insert) ----
   function initForm(){
     const form = document.querySelector('form[data-contact]'); if(!form) return;
     form.addEventListener('submit', async (e) => {
@@ -116,18 +113,13 @@
         await SB.sbInsert('inquiries', {
           name: d.name || '',
           org: d.org || null,
-          phone: d.phone || null,
           email: d.email || '',
           topic: d.topic || null,
           message: d.message || '',
           source: 'website',
           user_agent: navigator.userAgent.slice(0, 240),
         });
-        form.innerHTML = `<div style="text-align:center;padding:40px 20px">
-          <div style="font-family:'Instrument Serif',serif;font-style:italic;font-size:32px;color:var(--navy);letter-spacing:-0.02em;margin-bottom:14px">${lang==='ko'?'고맙습니다.':'Thank you.'}</div>
-          <p style="color:var(--ink-3);font-size:15px;line-height:1.7;max-width:42ch;margin:0 auto">${lang==='ko'?'요청이 정상적으로 접수되었습니다.<br>24시간 안에 1:1로 회신드리겠습니다.':'Your inquiry has been received.<br>We will reply within 24 hours.'}</p>
-          <a href="index.html" style="display:inline-block;margin-top:32px;font-size:13px;color:var(--ink-3);border-bottom:1px solid var(--gold);padding-bottom:2px">← ${lang==='ko'?'메인으로':'Back home'}</a>
-        </div>`;
+        form.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-family:Instrument Serif,serif;font-style:italic;font-size:32px;color:var(--navy);letter-spacing:-0.02em;margin-bottom:14px">' + (lang==='ko'?'고맙습니다.':'Thank you.') + '</div><p style="color:var(--ink-3);font-size:15px;line-height:1.7;max-width:42ch;margin:0 auto">' + (lang==='ko'?'요청이 정상적으로 접수되었습니다.<br>24시간 안에 1:1로 회신드리겠습니다.':'Your inquiry has been received.<br>We will reply within 24 hours.') + '</p><a href="index.html" style="display:inline-block;margin-top:32px;font-size:13px;color:var(--ink-3);border-bottom:1px solid var(--gold);padding-bottom:2px">← ' + (lang==='ko'?'메인으로':'Back home') + '</a></div>';
       } catch (err) {
         console.error(err);
         alert((lang==='ko'?'전송 중 오류가 발생했습니다.':'Submission failed.') + '\n' + err.message);
@@ -136,7 +128,7 @@
     });
   }
 
-  // ---- Scroll drift ----
+  // ---- Scroll-driven aurora drift ----
   function initScrollDrift(){
     if (REDUCED) return;
     let ticking=false;
@@ -145,7 +137,7 @@
     up();
   }
 
-  // ---- Mouse move ----
+  // ---- Mouse-move aurora reactivity ----
   function initMouseMove(){
     if (REDUCED || COARSE) return;
     const heroes = document.querySelectorAll('.hero, .product-hero, .page-hero');
@@ -172,7 +164,7 @@
     });
   }
 
-  // ---- Cursor follow ----
+  // ---- Cursor follower (soft gold halo) ----
   function initCursorFollow(){
     if (REDUCED || COARSE) return;
     if (window.innerWidth < 980) return;
@@ -185,10 +177,52 @@
     const loop=()=>{
       cx += (tx-cx)*0.12;
       cy += (ty-cy)*0.12;
-      el.style.transform = `translate(${cx}px, ${cy}px) translate(-50%,-50%)`;
+      el.style.transform = 'translate(' + cx + 'px, ' + cy + 'px) translate(-50%,-50%)';
       requestAnimationFrame(loop);
     };
     loop();
+  }
+
+  // ---- Scroll progress bar at top ----
+  function initScrollProgress(){
+    if (REDUCED) return;
+    const bar = document.createElement('div');
+    bar.className = 'scroll-progress';
+    document.body.appendChild(bar);
+    let raf;
+    const update = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+      bar.style.width = pct + '%';
+      raf = null;
+    };
+    window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+    update();
+  }
+
+  // ---- Floating scroll-to-top button ----
+  function initScrollTop(){
+    const btn = document.createElement('button');
+    btn.className = 'scroll-top';
+    btn.setAttribute('aria-label', 'Scroll to top');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+    document.body.appendChild(btn);
+    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' }));
+    const update = () => btn.classList.toggle('show', window.scrollY > window.innerHeight * 0.6);
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+
+  // ---- Section heading underline reveal (decorative) ----
+  function initHeadingUnderline(){
+    if (!('IntersectionObserver' in window)) return;
+    const heads = document.querySelectorAll('.section-head');
+    if (!heads.length) return;
+    const obs = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); }});
+    }, { threshold:0.3 });
+    heads.forEach(h=>obs.observe(h));
   }
 
   function start(){
@@ -202,6 +236,9 @@
     initScrollDrift();
     initMouseMove();
     initCursorFollow();
+    initScrollProgress();
+    initScrollTop();
+    initHeadingUnderline();
   }
 
   if (document.readyState === 'loading'){

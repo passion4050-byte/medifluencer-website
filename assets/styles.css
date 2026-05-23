@@ -1173,3 +1173,397 @@ strong{color:var(--navy);font-weight:600}
 
 /* ===== Skip link & a11y polish ===== */
 a:focus-visible, button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
+
+
+/* ============================================
+   QA PATCH · v3
+   - Tier featured: badge no longer overlaps gradient border
+   - Tier card breathing room
+   - Readability gen-2 (KR line rhythm, max-widths, spacing)
+   ============================================ */
+
+/* Featured tier — kill conflicting gradient ::after, keep clean border + lifted badge */
+.tier{position:relative;isolation:isolate;border-radius:14px;padding:44px 32px 36px}
+.tier.featured{
+  background:linear-gradient(180deg, #fff 0%, var(--bg-soft) 100%);
+  border:1.5px solid var(--gold);
+  transform:translateY(-12px);
+  box-shadow:0 28px 56px -20px rgba(184,149,103,.35), 0 8px 16px -4px rgba(10,37,64,.08);
+  margin-top:18px; /* room for badge to sit cleanly */
+}
+.tier.featured::after{content:none}
+.tier.featured::before{
+  content:attr(data-badge);
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  background:var(--gold);color:var(--navy);
+  font-size:10.5px;letter-spacing:.22em;font-weight:700;text-transform:uppercase;
+  padding:6px 16px;border-radius:999px;
+  box-shadow:0 6px 16px -6px rgba(184,149,103,.6);
+  z-index:3;white-space:nowrap;
+}
+@media (max-width:960px){.tier.featured{transform:none;margin-top:24px}}
+
+/* Tier titles — tighter, premium */
+.tier-name{margin-bottom:10px}
+.tier-title{font-size:26px;line-height:1.2;margin-bottom:14px;letter-spacing:-0.015em}
+.tier-desc{font-size:14.5px;line-height:1.7;color:var(--ink-3);min-height:48px;margin-bottom:24px;word-break:keep-all}
+.tier-list{gap:14px;margin-bottom:28px}
+.tier-list li{font-size:14px;line-height:1.65;word-break:keep-all}
+
+/* Tier hover lift on non-featured */
+.tier:not(.featured):hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 18px 36px -16px rgba(10,37,64,.18)}
+
+/* ============================================
+   READABILITY GEN-2 — KR line rhythm, breathing
+   ============================================ */
+html[lang="ko"] p, html[lang="ko"] li{word-break:keep-all;line-height:1.8}
+html[lang="en"] p, html[lang="en"] li{line-height:1.7}
+
+/* Hero sub & page-hero subtitle widths */
+.hero-sub{max-width:52ch;font-size:17.5px;line-height:1.75}
+.page-hero p{max-width:54ch;font-size:17px;line-height:1.72}
+.product-hero p[style*="font-size:19px"]{font-size:18px !important;line-height:1.72 !important}
+
+/* Section paragraph readability */
+.narrative p{max-width:56ch}
+.section-head p{max-width:58ch;line-height:1.72;font-size:16.5px}
+
+/* Card body readability */
+.pillar p, .case p, .ctype > p, .diag ul li, .value p, .bmodel p, .stage > p{line-height:1.7;word-break:keep-all}
+
+/* Heading wrap rhythm */
+h1, h2, h3, .display{word-break:keep-all}
+.section-head h2{max-width:22ch;margin-left:auto;margin-right:auto;letter-spacing:-0.025em}
+.section-head.left h2{margin-left:0;text-align:left}
+
+/* Footer breathing */
+.footer-blurb{max-width:32ch;line-height:1.75;font-size:14px}
+.footer-col ul{gap:12px}
+.footer-col a{font-size:14px}
+
+/* Contact form — tighter, more aligned */
+.contact-form{padding:40px 36px}
+.form-field{margin-bottom:20px}
+.form-field label{font-size:11px;letter-spacing:.18em;margin-bottom:8px}
+
+/* CTA inside dark backgrounds — bigger hit area */
+.cta-band .btn{padding:15px 28px;font-size:15px}
+
+/* Trust cells — better number-to-label gap */
+.trust-num{font-size:46px;margin-bottom:2px}
+.trust-cell .trust-lbl{font-size:14px;margin-top:12px;font-weight:600;color:var(--navy)}
+.trust-cell .trust-desc{font-size:13px;line-height:1.6;color:var(--ink-3)}
+
+/* Pillar stricter rhythm */
+.pillar{padding:36px 30px}
+.pillar h3{font-size:21px;margin-bottom:14px}
+.pillar p{font-size:14.5px}
+
+/* Case card hierarchy */
+.case h3{font-size:24px;letter-spacing:-0.015em}
+.case-metric-val{font-size:46px}
+
+/* Diag cards — slightly bigger headlines */
+.diag h4{font-size:19px;line-height:1.35}
+.diag ul li{font-size:14.5px;line-height:1.7}
+
+/* Pull-quote tighter */
+.pullquote{font-size:clamp(22px, 2.8vw, 36px);line-height:1.32;padding:56px 0;max-width:760px}
+
+/* Influencer pool tile name readability */
+.influ-tile-name{font-size:13px;letter-spacing:-0.005em}
+.influ-tile-meta{font-size:10px}
+
+/* Smooth section transitions on scroll */
+.section{padding:clamp(72px, 8vw, 112px) 0}
+
+/* Section dividers — gold mark */
+.section + .section{position:relative}
+.section + .section::before{
+  content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:32px;height:1px;background:var(--gold);opacity:.4;
+}
+
+/* Better focus rings for accessibility */
+input:focus-visible, textarea:focus-visible, select:focus-visible, a:focus-visible, button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+
+/* Mobile compacting */
+@media (max-width:640px){
+  .tier{padding:36px 24px 32px}
+  .tier-title{font-size:22px}
+  .pillar{padding:28px 22px}
+  .stage{padding:28px 22px}
+  .diag{padding:24px}
+  .case{padding:28px 22px}
+  .ctype{padding:24px 22px}
+  .section-head{margin-bottom:48px}
+  .section-head h2{font-size:24px}
+  .narrative{gap:40px}
+}
+
+
+/* ============================================
+   PC + MOBILE REFINEMENT · v4
+   ============================================ */
+
+/* ===== PC (1280px+) — more generous canvas ===== */
+@media (min-width:1280px){
+  .container{max-width:1280px;padding:0 32px}
+  .section{padding:128px 0}
+  h1.display{font-size:clamp(58px, 5.6vw, 88px);line-height:1.04}
+  .hero-sub{font-size:18.5px}
+  .section-head h2{font-size:clamp(34px, 3.2vw, 48px)}
+  .narrative{gap:96px}
+  .stages{gap:24px}
+  .pillars{gap:28px}
+  .tier-grid{gap:28px}
+}
+
+/* ===== Large PC (1440px+) — editorial breathing ===== */
+@media (min-width:1440px){
+  .container{max-width:1320px}
+  .section{padding:144px 0}
+  .hero{padding:160px 0 120px}
+  .page-hero{padding:140px 0 96px}
+  .product-hero{padding:144px 0 96px}
+}
+
+/* ===== Tablet (760px - 1100px) — refinement ===== */
+@media (max-width:1100px) and (min-width:761px){
+  .container{padding:0 28px}
+  .hero-inner{grid-template-columns:1fr;gap:48px}
+  .product-hero-inner{grid-template-columns:1fr;gap:48px}
+  .hero-card, .influ-card{max-width:680px;margin:0 auto}
+  .narrative{grid-template-columns:1fr;gap:48px}
+}
+
+/* ===== Mobile (640px↓) — tight, touch-friendly ===== */
+@media (max-width:640px){
+  .container{padding:0 18px}
+  .nav-wrap{height:64px;gap:14px}
+  .brand-name{font-size:15px}
+  .brand-sub{font-size:9.5px}
+  .brand-mark{width:34px;height:34px}
+
+  /* Mobile menu slides in cleanly */
+  .nav-main{top:64px !important;padding:24px 22px 40px !important}
+  .nav-link{padding:16px 4px !important;font-size:15px !important}
+
+  /* Hero — tighter but breathing */
+  .hero{min-height:auto;padding:104px 0 72px}
+  .hero h1.display{font-size:clamp(36px, 9vw, 48px);line-height:1.08;letter-spacing:-0.03em}
+  .hero-sub{font-size:15.5px;line-height:1.68;margin-bottom:28px}
+  .hero-tag{font-size:10.5px;padding:6px 12px;margin-bottom:20px}
+  .hero-cta{flex-direction:column;align-items:stretch;width:100%}
+  .hero-cta .btn{justify-content:center;width:100%;padding:14px 22px;font-size:14.5px}
+  .hero-meta{flex-wrap:wrap;gap:12px;margin-top:32px;padding-top:24px}
+  .hero-meta-item{font-size:12px}
+  .hero-card{padding:28px 22px}
+  .hero-stats{gap:18px}
+  .hero-stat-val{font-size:30px}
+  .hero-stat-lbl{font-size:11.5px}
+
+  /* Page hero */
+  .page-hero{padding:88px 0 56px}
+  .page-hero h1{font-size:clamp(28px, 8vw, 36px);line-height:1.15;max-width:18ch}
+  .page-hero p{font-size:14.5px;line-height:1.7}
+
+  /* Product hero */
+  .product-hero{padding:96px 0 64px}
+  .product-hero h1{font-size:clamp(30px, 9vw, 44px) !important;line-height:1.1 !important}
+
+  /* Sections */
+  .section{padding:64px 0}
+  .section-head{margin-bottom:40px}
+  .section-head h2{font-size:clamp(22px, 6vw, 30px);line-height:1.22}
+  .section-head p{font-size:14.5px;line-height:1.7}
+  .pullquote{font-size:20px;padding:40px 0}
+
+  /* Cards */
+  .pillar{padding:28px 22px}
+  .pillar h3{font-size:18px}
+  .pillar p{font-size:13.5px}
+  .case{padding:28px 22px}
+  .case h3{font-size:20px}
+  .case-metric-val{font-size:34px}
+  .ctype{padding:24px 20px}
+  .ctype h4{font-size:17px}
+  .diag{padding:22px}
+  .diag h4{font-size:17px}
+  .stage{padding:28px 22px 32px}
+  .stage h3{font-size:19px}
+  .stage-num{font-size:38px}
+  .value{padding:24px 22px}
+  .tier{padding:32px 22px 28px}
+  .tier-title{font-size:20px}
+  .tier.featured{margin-top:24px}
+
+  /* Trust grid 2x2 */
+  .trust-grid{grid-template-columns:1fr 1fr;gap:1px}
+  .trust-cell{padding:28px 20px}
+  .trust-num{font-size:32px}
+
+  /* KPI roadmap 1col */
+  .kpi-roadmap{grid-template-columns:1fr}
+  .kpi-cell{padding:24px 22px}
+
+  /* Track row */
+  .track-row{grid-template-columns:1fr}
+
+  /* Stages 1col */
+  .stages{grid-template-columns:1fr;gap:14px}
+
+  /* Funnel — flatten margins on small screen */
+  .funnel-stage[data-stage="TOFU"], .funnel-stage[data-stage="MOFU"], .funnel-stage[data-stage="BOFU"]{margin-left:0 !important;margin-right:0 !important}
+
+  /* CTA band */
+  .cta-band{padding:36px 22px}
+  .cta-band h2{font-size:22px;line-height:1.25}
+  .cta-band p{font-size:14.5px}
+  .cta-band .cta-row{flex-direction:column;width:100%}
+  .cta-band .btn{width:100%;justify-content:center}
+
+  /* Compare blocks */
+  .compare{grid-template-columns:1fr;gap:16px}
+  .compare-col{padding:28px 22px}
+
+  /* Hide decorative items on mobile to reduce visual noise */
+  .energy-line.l3{display:none}
+  .aurora-orb.o4{display:none}
+  .constellation{opacity:.5}
+
+  /* Influencer card — tighter */
+  .influ-card{padding:24px 18px}
+  .influ-card-header{flex-direction:column;align-items:flex-start;gap:16px;margin-bottom:20px}
+  .influ-card-header .stat-row{gap:16px}
+  .influ-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .influ-tile{aspect-ratio:1/1.2}
+
+  /* Footer */
+  .site-footer{padding:56px 0 24px}
+  .footer-grid{gap:32px;margin-bottom:36px}
+  .footer-brand-name{font-size:22px}
+  .footer-blurb{font-size:13px}
+  .footer-col h4{font-size:11.5px;margin-bottom:14px}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:14px;text-align:left}
+
+  /* Form */
+  .contact-form{padding:28px 22px}
+  .form-field input, .form-field textarea, .form-field select{padding:12px 14px;font-size:15px}
+  .form-row{grid-template-columns:1fr;gap:14px}
+
+  /* Tiers grid */
+  .tier-grid{grid-template-columns:1fr;gap:16px}
+  .tier-list{margin-bottom:24px}
+
+  /* Process steps */
+  .process{grid-template-columns:1fr;gap:12px}
+
+  /* Stat / pillar grids */
+  .pillars, .value-grid, .ctype-grid, .bmodel-grid, .cases, .diag-grid{grid-template-columns:1fr;gap:14px}
+
+  /* Cursor follower off (already handled by pointer:coarse) */
+
+  /* Background film grain — lighter on mobile for perf */
+  body::before{opacity:.025}
+}
+
+/* ===== Tiny mobile (480px↓) ===== */
+@media (max-width:480px){
+  .container{padding:0 16px}
+  .hero h1.display{font-size:34px;line-height:1.1}
+  .page-hero h1, .product-hero h1{font-size:30px !important}
+  .hero-stats{grid-template-columns:1fr 1fr}
+  .trust-grid{grid-template-columns:1fr}
+  .influ-grid{grid-template-columns:1fr}
+}
+
+/* ============================================
+   NEW SAFE INTERACTIONS
+   None of these affect content visibility.
+   ============================================ */
+
+/* 1. Scroll progress bar at top */
+.scroll-progress{
+  position:fixed;top:0;left:0;height:2px;width:0;
+  background:linear-gradient(90deg, #1F5FA8, #B89567 50%, #7A4FCF);
+  z-index:200;pointer-events:none;
+  transition:width .15s linear;
+  box-shadow:0 0 12px rgba(184,149,103,.5);
+}
+
+/* 2. Floating scroll-to-top button */
+.scroll-top{
+  position:fixed;bottom:24px;right:24px;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(10,37,64,.92);color:#fff;
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(184,149,103,.35);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:90;
+  opacity:0;transform:translateY(10px);pointer-events:none;
+  transition:opacity .3s ease, transform .3s ease, background .25s ease;
+  box-shadow:0 8px 24px -8px rgba(0,0,0,.35);
+}
+.scroll-top.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.scroll-top:hover{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.scroll-top svg{width:18px;height:18px}
+@media (max-width:640px){.scroll-top{bottom:16px;right:16px;width:42px;height:42px}}
+
+/* 3. h2 underline reveal on scroll-in (decorative — content always visible) */
+.section-head h2{position:relative;display:inline-block;padding-bottom:14px}
+.section-head h2::after{
+  content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:0;height:1px;background:var(--gold);
+  transition:width 1s cubic-bezier(.2,.8,.2,1) .2s;
+}
+.section-head.in h2::after, .section-head[data-reveal].in h2::after{width:48px}
+.section-head.left h2{display:inline-block}
+.section-head.left h2::after{left:0;transform:none}
+
+/* 4. Magnetic CTA hover (mouse only, very subtle) */
+@media (pointer:fine){
+  .btn-gold, .btn-aurora, .btn-primary{transition:transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease}
+  .btn-gold:active, .btn-aurora:active{transform:translateY(0) scale(.98)}
+}
+
+/* 5. Card top-border sweep on hover (replaces removed conic on tiers) */
+.tier:not(.featured)::before{
+  content:"";position:absolute;top:0;left:0;width:0;height:2px;
+  background:linear-gradient(90deg, var(--gold), transparent);
+  transition:width .55s cubic-bezier(.2,.8,.2,1);
+}
+.tier:not(.featured):hover::before{width:60%}
+
+/* 6. Influencer tile name shift on hover */
+.influ-tile{transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease}
+.influ-tile-name{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.influ-tile:hover .influ-tile-name{transform:translateY(-2px)}
+
+/* 7. Trust cell number subtle scale on hover */
+.trust-cell{transition:background .3s ease}
+.trust-cell .trust-num{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.trust-cell:hover .trust-num{transform:scale(1.04)}
+
+/* 8. Nav link underline grow */
+.nav-link{position:relative}
+.nav-link::after{
+  content:"";position:absolute;left:14px;right:14px;bottom:6px;
+  height:1px;background:var(--gold);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .3s cubic-bezier(.2,.8,.2,1);
+}
+.nav-link:hover::after, .nav-link.active::after{transform:scaleX(1)}
+@media (max-width:960px){.nav-link::after{display:none}}
+
+/* 9. Form submit button — pulse subtly when empty form (gentle hint) */
+.contact-form button[type="submit"]{transition:transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease}
+
+/* 10. Image / placeholder fade-in for blog covers */
+.blog-cover{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.blog-card:hover .blog-cover{transform:scale(1.02)}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion:reduce){
+  .scroll-progress, .scroll-top, .nav-link::after, .tier:not(.featured)::before, .section-head h2::after{transition:none !important;animation:none !important}
+}
