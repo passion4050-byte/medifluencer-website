@@ -1850,3 +1850,67 @@ body{-webkit-overflow-scrolling:touch;overscroll-behavior-y:none}
   .cta-band h2{font-size:22px !important;line-height:1.25}
   .cta-band p{font-size:14.5px !important}
 }
+
+
+/* ============================================
+   MISSION TILE — Mobile KPI Row Fix
+   ============================================ */
+.mission-kpi{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  padding:18px 0;
+  border-top:1px solid rgba(255,255,255,.10);
+  border-bottom:1px solid rgba(255,255,255,.10);
+  position:relative;z-index:1;
+}
+.mission-kpi-cell{text-align:center;padding:4px 6px}
+.mission-kpi-val{
+  font-family:'Instrument Serif',serif;font-style:italic;
+  font-size:24px;color:#fff;line-height:1;letter-spacing:-0.02em;
+  display:flex;align-items:baseline;justify-content:center;gap:1px;
+}
+.mission-kpi-val span{color:var(--gold);font-size:13px;font-weight:600;font-style:normal}
+.mission-kpi-lbl{font-size:10px;color:rgba(255,255,255,.55);margin-top:6px;letter-spacing:.08em;display:block}
+
+/* Tablet (768px-) — 2x2 grid */
+@media (max-width:768px) and (min-width:481px){
+  .mission-kpi{grid-template-columns:repeat(2,1fr);gap:18px}
+  .mission-kpi-val{font-size:26px}
+  .mission-kpi-lbl{font-size:11px}
+}
+
+/* Mobile (≤480px) — vertical rows: val ─ label horizontal */
+@media (max-width:480px){
+  .mission-kpi{
+    display:flex;flex-direction:column;gap:0;
+    padding:8px 0;
+  }
+  .mission-kpi-cell{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:14px;text-align:left;padding:11px 4px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .mission-kpi-cell:last-child{border-bottom:none}
+  .mission-kpi-val{
+    font-size:24px;justify-content:flex-start;
+    flex-shrink:0;
+  }
+  .mission-kpi-val span{font-size:13px}
+  .mission-kpi-lbl{
+    margin-top:0;font-size:11.5px;
+    color:rgba(255,255,255,.62);letter-spacing:.06em;
+    text-align:right;
+  }
+}
+
+/* Ensure mission tile has correct padding on small screens */
+@media (max-width:480px){
+  .mission-tile{padding:24px 22px 28px;min-height:auto}
+  .mission-net{max-height:120px;margin:14px 0 6px}
+  .mission-marker-num{font-size:18px}
+  .mission-marker-label{font-size:10px}
+  .art-tile-quote{font-size:17px;line-height:1.45;margin-top:18px}
+  .art-tile-quote::before{font-size:42px;left:-14px;top:-8px}
+  .art-tile-cite{font-size:11px;margin-top:14px}
+}
