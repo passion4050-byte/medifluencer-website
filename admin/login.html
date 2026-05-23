@@ -37,8 +37,8 @@
   <p class="login-sub">관리자 계정으로 로그인하세요. 첫 로그인 후에는 비밀번호를 즉시 변경하시는 것을 권장합니다.</p>
   <form id="loginForm" autocomplete="on">
     <div class="login-field">
-      <label>Email</label>
-      <input type="email" name="email" id="email" required autocomplete="username" placeholder="passion4050@gmail.com">
+      <label>아이디 또는 이메일</label>
+      <input type="text" name="email" id="email" required autocomplete="username" placeholder="admin">
     </div>
     <div class="login-field">
       <label>Password</label>
@@ -59,17 +59,27 @@ const err = document.getElementById('loginErr');
 // Auto-redirect if already signed in
 if (SB.sbAuth.isAuthenticated()) location.replace('inbox.html');
 
+// Map short usernames to full emails for convenience.
+// Keep email format internally — Supabase Auth requires it.
+function resolveEmail(input) {
+  const v = (input || '').trim();
+  if (!v) return v;
+  if (v.includes('@')) return v;             // already email
+  if (v.toLowerCase() === 'admin') return 'admin@medifluencer.app';
+  return v;                                  // pass through, will fail validation
+}
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   err.style.display = 'none';
   btn.disabled = true; btn.textContent = '로그인 중…';
-  const email = document.getElementById('email').value.trim();
+  const email = resolveEmail(document.getElementById('email').value);
   const password = document.getElementById('password').value;
   try {
     await SB.sbAuth.signInWithPassword({ email, password });
     location.replace('inbox.html');
   } catch (e) {
-    err.textContent = '로그인 실패 — 이메일 또는 비밀번호를 확인해주세요.';
+    err.textContent = '로그인 실패 — 아이디 또는 비밀번호를 확인해주세요.';
     err.style.display = 'block';
     btn.disabled = false; btn.textContent = '로그인';
   }

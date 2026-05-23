@@ -21,8 +21,5 @@
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]
     }
-  ],
-  "redirects": [
-    { "source": "/admin", "destination": "/admin/", "permanent": false }
   ]
 }
