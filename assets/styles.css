@@ -2274,3 +2274,117 @@ body.page-leaving{opacity:0;transition-duration:.18s}
 /* Safety: if JS fails to add page-loaded, content still shows */
 @keyframes pageLoadFallback{to{opacity:1}}
 body{animation:pageLoadFallback 1.5s linear 1s forwards}
+
+
+/* ============================================
+   CTA BUTTON · GOLD · GLOBAL POLISH · v14
+   - Higher contrast text (white on deeper gold)
+   - Consistent size across all pages
+   - Premium feel
+   ============================================ */
+.btn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px;
+  padding:15px 28px !important;
+  font-size:15px !important;
+  font-weight:700 !important;
+  letter-spacing:-0.005em !important;
+  border-radius:6px !important;
+  white-space:nowrap;
+  cursor:pointer;
+  min-height:48px;
+  line-height:1.2;
+  transition:transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease, background .25s ease, color .2s ease !important;
+}
+.btn svg{width:16px;height:16px;flex-shrink:0}
+
+/* ===== Gold CTA (primary) — deeper gold + white text ===== */
+.btn-gold{
+  background:linear-gradient(135deg, #A8884C 0%, #6E5530 100%) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+  box-shadow:0 10px 24px -8px rgba(110,85,48,.55),
+             inset 0 1px 0 rgba(255,255,255,.18),
+             inset 0 -1px 0 rgba(0,0,0,.12) !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.18) !important;
+  position:relative;overflow:hidden;isolation:isolate;
+}
+.btn-gold:hover{
+  background:linear-gradient(135deg, #B89567 0%, #8E6E45 100%) !important;
+  color:#fff !important;
+  transform:translateY(-2px);
+  box-shadow:0 16px 36px -8px rgba(184,149,103,.7),
+             inset 0 1px 0 rgba(255,255,255,.25),
+             inset 0 -1px 0 rgba(0,0,0,.10) !important;
+}
+.btn-gold:active{transform:translateY(0)}
+.btn-gold::after{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,.32) 50%, transparent 70%);
+  transform:translateX(-120%);
+  transition:transform .85s cubic-bezier(.2,.8,.2,1);
+}
+.btn-gold:hover::after{transform:translateX(120%)}
+.btn-gold svg{stroke:#fff;color:#fff}
+
+/* ===== Ghost (on-dark) — refined border + hover invert ===== */
+.btn-ghost.on-dark{
+  background:rgba(255,255,255,.06) !important;
+  color:#fff !important;
+  border:1.5px solid rgba(255,255,255,.28) !important;
+  backdrop-filter:blur(8px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+.btn-ghost.on-dark:hover{
+  background:#fff !important;
+  color:var(--navy) !important;
+  border-color:#fff !important;
+  transform:translateY(-2px);
+  box-shadow:0 10px 24px -8px rgba(0,0,0,.3) !important;
+}
+
+/* Ghost (on light) */
+.btn-ghost:not(.on-dark){
+  background:#fff !important;
+  color:var(--navy) !important;
+  border:1.5px solid var(--line) !important;
+}
+.btn-ghost:not(.on-dark):hover{
+  border-color:var(--navy) !important;
+  background:var(--navy) !important;
+  color:#fff !important;
+  transform:translateY(-2px);
+}
+
+/* Primary (blue) — keep for forms */
+.btn-primary{
+  background:var(--blue) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.15) !important;
+  box-shadow:0 8px 20px -8px rgba(31,95,168,.55), inset 0 1px 0 rgba(255,255,255,.2) !important;
+}
+.btn-primary:hover{
+  background:var(--blue-hi) !important;
+  transform:translateY(-2px);
+  box-shadow:0 14px 28px -8px rgba(31,95,168,.65), inset 0 1px 0 rgba(255,255,255,.25) !important;
+}
+
+/* Smaller variant for tighter spaces */
+.btn-sm{padding:10px 18px !important;font-size:13.5px !important;min-height:38px !important}
+
+/* Mobile sizing — full-width inside CTA bands */
+@media (max-width:640px){
+  .btn{padding:14px 24px !important;font-size:14.5px !important;min-height:46px !important}
+  .cta-band > .cta-row .btn,
+  .news-bottom-cta .btn,
+  .post-bottom-cta .btn{width:100% !important}
+}
+
+/* News page bottom CTA, Post bottom CTA — uniform style */
+.news-bottom-cta .btn-gold,
+.post-bottom-cta .btn-gold{padding:15px 30px !important}
+
+/* Hero CTA — slightly stronger */
+.hero-cta .btn-gold, .hero-cta .btn-primary, .hero-cta .btn{padding:16px 30px !important;font-size:15px !important;min-height:50px}
