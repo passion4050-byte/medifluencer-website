@@ -270,6 +270,46 @@
     heads.forEach(h=>obs.observe(h));
   }
 
+  // ---- Page transition + nav prefetch (smoother PC navigation) ----
+  function initPageTransition(){
+    if (REDUCED) return;
+    // Add a fade-in on page load so hard cuts feel soft
+    document.body.classList.add('page-loaded');
+    // On nav link click, fade out before navigating
+    document.querySelectorAll('a[href$=".html"]').forEach(a => {
+      // Skip external, same-page anchors, mailto, etc
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto') || a.target === '_blank') return;
+      a.addEventListener('click', (e) => {
+        // Allow modifier-click for new tab
+        if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+        e.preventDefault();
+        document.body.classList.add('page-leaving');
+        setTimeout(() => { window.location.href = href; }, 180);
+      });
+    });
+  }
+
+  // ---- Nav prefetch on hover — pre-fetches HTML before click ----
+  function initNavPrefetch(){
+    if (COARSE) return; // mobile = no hover
+    const prefetched = new Set();
+    const prefetch = (url) => {
+      if (prefetched.has(url)) return;
+      prefetched.add(url);
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = url;
+      link.as = 'document';
+      document.head.appendChild(link);
+    };
+    document.querySelectorAll('.nav-link, a.btn, a.news-card, a.news-featured').forEach(a => {
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto')) return;
+      a.addEventListener('mouseenter', () => prefetch(href), { once: false, passive: true });
+    });
+  }
+
   function start(){
     initGoogleTranslate();
     initLang();
@@ -285,6 +325,8 @@
     initScrollProgress();
     initScrollTop();
     initHeadingUnderline();
+    initNavPrefetch();
+    initPageTransition();
   }
 
   if (document.readyState === 'loading'){

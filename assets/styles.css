@@ -2194,3 +2194,83 @@ body{-webkit-overflow-scrolling:touch;overscroll-behavior-y:none}
 
 /* Dark variant */
 .section-navy .section-head p, .product-hero .section-head p{color:rgba(255,255,255,.82)}
+
+
+/* ============================================
+   FINAL STACK FIX · v12
+   - All inline-flex/inline-block siblings must wrap to next line
+   ============================================ */
+
+/* Blog page bottom CTA — same grid treatment as .cta-band */
+.news-bottom-cta{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  justify-items:center !important;
+  text-align:center !important;
+  row-gap:0;
+}
+.news-bottom-cta > h3,
+.news-bottom-cta > p,
+.news-bottom-cta > a,
+.news-bottom-cta > .btn{
+  grid-column:1 !important;
+  width:auto !important;
+  max-width:100% !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  display:flex !important;
+}
+.news-bottom-cta > h3{display:block !important;margin-bottom:14px !important}
+.news-bottom-cta > p{display:block !important;margin-bottom:0 !important;max-width:48ch}
+.news-bottom-cta > p + p{margin-top:0 !important}
+.news-bottom-cta > p:last-of-type{margin-bottom:28px !important}
+.news-bottom-cta > a.btn{
+  display:inline-flex !important;
+  width:fit-content !important;
+  align-items:center !important;
+  justify-content:center !important;
+  margin-top:0 !important;
+}
+@media (max-width:640px){
+  .news-bottom-cta > a.btn{width:100% !important}
+}
+
+/* Service section dark — section-head must stack on dark sections too */
+.section-navy .section-head,
+.section-navy .section-head[data-reveal]{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  justify-items:center !important;
+  text-align:center !important;
+}
+.section-navy .section-head > *{grid-column:1 !important;width:auto !important;max-width:100%}
+.section-navy .section-head h2{display:block !important;margin:0 auto 14px !important;max-width:24ch}
+.section-navy .section-head p{display:block !important;margin:0 auto !important;max-width:60ch}
+
+/* Generic safety — any inline-flex .btn right after a <p> must wrap */
+p + .btn, p + a.btn, p + .cta-row{margin-top:14px}
+
+
+/* ============================================
+   PAGE TRANSITION · v13
+   - Soft fade between pages so PC nav feels instant, not "hard"
+   ============================================ */
+body{
+  opacity:0;
+  transition:opacity .35s cubic-bezier(.2,.8,.2,1);
+}
+body.page-loaded{opacity:1}
+body.page-leaving{opacity:0;transition-duration:.18s}
+
+/* Nav link hover — slightly faster feedback */
+.nav-link{transition:color .15s ease, background .15s ease}
+.nav-link:active{transform:translateY(1px)}
+
+@media (prefers-reduced-motion: reduce){
+  body{opacity:1 !important;transition:none !important}
+  body.page-leaving{opacity:1 !important}
+}
+
+/* Safety: if JS fails to add page-loaded, content still shows */
+@keyframes pageLoadFallback{to{opacity:1}}
+body{animation:pageLoadFallback 1.5s linear 1s forwards}
