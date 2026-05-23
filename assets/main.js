@@ -1,9 +1,8 @@
-/* Medifluencer - main.js (safe mode v4 + Google Translate) */
+/* Medifluencer - main.js (safe mode v5 + GT + safe menu) */
 (function () {
   'use strict';
   const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const COARSE = window.matchMedia('(pointer: coarse)').matches;
-  let gtReady = false;
 
   // ---- Language ----
   const SUPPORTED = ['ko','en'];
@@ -14,11 +13,9 @@
     document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
     const t = document.querySelector('title');
     if (t && t.dataset.ko && t.dataset.en) t.textContent = lang==='ko'? t.dataset.ko : t.dataset.en;
-    // Apply Google Translate as fallback for any KR text outside our [data-lang] system
     triggerGoogleTranslate(lang);
   }
   function initLang(){
-    // Force both lang buttons visible regardless of CSS conflicts
     document.querySelectorAll('.lang-btn').forEach(b=>{
       b.style.display='inline-flex';
       b.style.visibility='visible';
@@ -30,14 +27,11 @@
     document.querySelectorAll('.lang-btn').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
   }
 
-  // ---- Google Translate integration ----
+  // ---- Google Translate ----
   function initGoogleTranslate(){
-    // Mark our hand-crafted EN content so GT doesn't re-translate it
     document.querySelectorAll('[data-lang="en"], code, .mono, .brand-name, .brand-sub').forEach(el=>{
-      el.setAttribute('translate','no');
-      el.classList.add('notranslate');
+      el.setAttribute('translate','no'); el.classList.add('notranslate');
     });
-    // Create hidden container
     if (!document.getElementById('google_translate_element')) {
       const div = document.createElement('div');
       div.id = 'google_translate_element';
@@ -47,13 +41,9 @@
     window.googleTranslateElementInit = function(){
       try {
         new google.translate.TranslateElement({
-          pageLanguage: 'ko',
-          includedLanguages: 'en',
-          autoDisplay: false,
-          layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+          pageLanguage: 'ko', includedLanguages: 'en',
+          autoDisplay: false, layout: google.translate.TranslateElement.InlineLayout.SIMPLE
         }, 'google_translate_element');
-        gtReady = true;
-        // Apply stored language if EN
         const stored = (function(){try{return localStorage.getItem('mf_lang');}catch(e){return null;}})();
         if (stored === 'en') triggerGoogleTranslate('en');
       } catch(e) { console.warn('GT init failed', e); }
@@ -63,37 +53,51 @@
     s.async = true;
     document.head.appendChild(s);
   }
-
   function triggerGoogleTranslate(lang){
     const tryFire = (attempts=0) => {
       const sel = document.querySelector('.goog-te-combo');
       if (sel) {
         const target = lang === 'en' ? 'en' : '';
-        if (sel.value !== target) {
-          sel.value = target;
-          sel.dispatchEvent(new Event('change'));
-        }
-      } else if (attempts < 25) {
-        setTimeout(()=>tryFire(attempts+1), 200);
-      }
+        if (sel.value !== target) { sel.value = target; sel.dispatchEvent(new Event('change')); }
+      } else if (attempts < 25) { setTimeout(()=>tryFire(attempts+1), 200); }
     };
     tryFire();
   }
 
-  // ---- Sticky header scrolled state ----
+  // ---- Header ----
   function initHeader(){
     const h = document.querySelector('.site-header'); if(!h) return;
     const up=()=>h.classList.toggle('scrolled', window.scrollY>8);
     window.addEventListener('scroll',up,{passive:true}); up();
   }
 
-  // ---- Mobile menu ----
+  // ---- Mobile menu (SAFE) ----
   function initMenu(){
     const t = document.querySelector('.menu-toggle');
     const n = document.querySelector('.nav-main');
     if(!t||!n) return;
-    t.addEventListener('click',()=>{t.classList.toggle('open');n.classList.toggle('open');});
-    n.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{t.classList.remove('open');n.classList.remove('open');}));
+    const close = () => {
+      t.classList.remove('open'); n.classList.remove('open');
+      document.body.classList.remove('menu-open');
+      t.setAttribute('aria-expanded','false');
+    };
+    const open = () => {
+      t.classList.add('open'); n.classList.add('open');
+      document.body.classList.add('menu-open');
+      t.setAttribute('aria-expanded','true');
+    };
+    t.setAttribute('aria-expanded','false');
+    n.id = n.id || 'site-nav';
+    t.setAttribute('aria-controls', n.id);
+    t.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (n.classList.contains('open')) close(); else open();
+    });
+    n.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    document.addEventListener('click', (e) => {
+      if (n.classList.contains('open') && !n.contains(e.target) && !t.contains(e.target)) close();
+    });
   }
 
   // ---- Auto-stagger ----
@@ -105,24 +109,17 @@
     });
   }
 
-  // ---- Reveal (SAFE) ----
+  // ---- Reveal ----
   function initReveal(){
     const els = document.querySelectorAll('[data-reveal]');
     if (!els.length) return;
-    if (!('IntersectionObserver' in window)){
-      els.forEach(e=>e.classList.add('in'));
-      return;
-    }
+    if (!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
     const obs = new IntersectionObserver(entries=>{
-      entries.forEach(e=>{
-        if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); }
-      });
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); }});
     },{threshold:0.04, rootMargin:'0px 0px -30px 0px'});
     els.forEach(e=>obs.observe(e));
     document.querySelectorAll('.hero [data-reveal], .page-hero [data-reveal], .product-hero [data-reveal]').forEach(el=>el.classList.add('in'));
-    setTimeout(()=>{
-      document.querySelectorAll('[data-reveal]:not(.in)').forEach(el=>el.classList.add('in'));
-    }, 800);
+    setTimeout(()=>{ document.querySelectorAll('[data-reveal]:not(.in)').forEach(el=>el.classList.add('in')); }, 800);
   }
 
   // ---- Counter ----
@@ -132,8 +129,7 @@
     const step=(now)=>{
       const t = Math.min(1,(now-start)/dur);
       const e = 1 - Math.pow(1-t,3);
-      const v = tg*e;
-      el.textContent = fmt==='int' ? Math.round(v).toLocaleString() : v.toFixed(1);
+      el.textContent = fmt==='int' ? Math.round(tg*e).toLocaleString() : (tg*e).toFixed(1);
       if (t<1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
@@ -146,10 +142,17 @@
       entries.forEach(e=>{ if(e.isIntersecting){ animateNum(e.target); obs.unobserve(e.target); }});
     },{threshold:0.3});
     ns.forEach(n=>obs.observe(n));
+    // Hero counters fire immediately on load
     document.querySelectorAll('.hero [data-count], .product-hero [data-count]').forEach(n=>{ animateNum(n); obs.unobserve(n); });
+    // Safety net — any counter still showing 0 after 1.5s gets force-animated
+    setTimeout(()=>{
+      document.querySelectorAll('[data-count]').forEach(n=>{
+        if (n.textContent === '0' || n.textContent === '0.0') { animateNum(n); }
+      });
+    }, 1500);
   }
 
-  // ---- Contact form ----
+  // ---- Form ----
   function initForm(){
     const form = document.querySelector('form[data-contact]'); if(!form) return;
     form.addEventListener('submit', async (e) => {
@@ -162,13 +165,9 @@
       try {
         if (typeof SB === 'undefined') throw new Error('Supabase client missing');
         await SB.sbInsert('inquiries', {
-          name: d.name || '',
-          org: d.org || null,
-          email: d.email || '',
-          topic: d.topic || null,
-          message: d.message || '',
-          source: 'website',
-          user_agent: navigator.userAgent.slice(0, 240),
+          name: d.name || '', org: d.org || null, email: d.email || '',
+          topic: d.topic || null, message: d.message || '',
+          source: 'website', user_agent: navigator.userAgent.slice(0, 240),
         });
         form.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-family:Instrument Serif,serif;font-style:italic;font-size:32px;color:var(--navy);letter-spacing:-0.02em;margin-bottom:14px">' + (lang==='ko'?'고맙습니다.':'Thank you.') + '</div><p style="color:var(--ink-3);font-size:15px;line-height:1.7;max-width:42ch;margin:0 auto">' + (lang==='ko'?'요청이 정상적으로 접수되었습니다.<br>24시간 안에 1:1로 회신드리겠습니다.':'Your inquiry has been received.<br>We will reply within 24 hours.') + '</p><a href="index.html" style="display:inline-block;margin-top:32px;font-size:13px;color:var(--ink-3);border-bottom:1px solid var(--gold);padding-bottom:2px">← ' + (lang==='ko'?'메인으로':'Back home') + '</a></div>';
       } catch (err) {
@@ -179,7 +178,7 @@
     });
   }
 
-  // ---- Scroll drift (skip on touch — causes jank on mobile) ----
+  // ---- Scroll drift (skip on touch) ----
   function initScrollDrift(){
     if (REDUCED || COARSE) return;
     if (window.innerWidth < 769) return;
@@ -189,11 +188,10 @@
     up();
   }
 
-  // ---- Mouse-move aurora ----
+  // ---- Mouse move ----
   function initMouseMove(){
     if (REDUCED || COARSE) return;
-    const heroes = document.querySelectorAll('.hero, .product-hero, .page-hero');
-    heroes.forEach(hero=>{
+    document.querySelectorAll('.hero, .product-hero, .page-hero').forEach(hero=>{
       let raf;
       hero.addEventListener('mousemove',(e)=>{
         if (raf) return;
@@ -202,10 +200,7 @@
           const mx = ((e.clientX-r.left)/r.width - 0.5);
           const my = ((e.clientY-r.top)/r.height - 0.5);
           const aurora = hero.querySelector('.aurora');
-          if (aurora){
-            aurora.style.setProperty('--mx', mx.toFixed(3));
-            aurora.style.setProperty('--my', my.toFixed(3));
-          }
+          if (aurora){ aurora.style.setProperty('--mx', mx.toFixed(3)); aurora.style.setProperty('--my', my.toFixed(3)); }
           raf=null;
         });
       });
@@ -227,15 +222,14 @@
     let tx=innerWidth/2, ty=innerHeight/2, cx=tx, cy=ty;
     document.addEventListener('mousemove',(e)=>{ tx=e.clientX; ty=e.clientY; },{passive:true});
     const loop=()=>{
-      cx += (tx-cx)*0.12;
-      cy += (ty-cy)*0.12;
+      cx += (tx-cx)*0.12; cy += (ty-cy)*0.12;
       el.style.transform = 'translate(' + cx + 'px, ' + cy + 'px) translate(-50%,-50%)';
       requestAnimationFrame(loop);
     };
     loop();
   }
 
-  // ---- Scroll progress bar ----
+  // ---- Scroll progress ----
   function initScrollProgress(){
     if (REDUCED) return;
     const bar = document.createElement('div');
@@ -245,8 +239,7 @@
     const update = () => {
       const h = document.documentElement;
       const max = h.scrollHeight - h.clientHeight;
-      const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
-      bar.style.width = pct + '%';
+      bar.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
       raf = null;
     };
     window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });

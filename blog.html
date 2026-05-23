@@ -12,206 +12,71 @@
 <link rel="stylesheet" href="assets/styles.css">
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="%230A2540"/><path d="M9 22V10h2.4l3.1 7.4L17.6 10H20v12h-1.9v-8.1L15 22h-1.4L10.5 13.9V22z" fill="%23B89567"/></svg>'>
 <style>
-/* ===== Blog page — bespoke layout ===== */
-
-/* Category filter */
 .news-filter{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 auto 56px;max-width:760px}
-.news-filter-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:9px 18px;border-radius:999px;
-  background:#fff;border:1px solid var(--line);
-  font-size:13px;font-weight:600;color:var(--ink-2);
-  cursor:pointer;letter-spacing:-0.005em;
-  transition:all .25s cubic-bezier(.2,.8,.2,1);
-}
+.news-filter-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;transition:all .25s cubic-bezier(.2,.8,.2,1)}
 .news-filter-btn:hover{border-color:var(--gold);color:var(--navy);transform:translateY(-1px)}
-.news-filter-btn.active{
-  background:var(--navy);color:#fff;border-color:var(--navy);
-  box-shadow:0 6px 16px -6px rgba(10,37,64,.35);
-}
-.news-filter-btn .count{
-  font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:999px;
-  background:rgba(0,0,0,.08);color:var(--ink-3);min-width:18px;text-align:center;
-}
+.news-filter-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 6px 16px -6px rgba(10,37,64,.35)}
+.news-filter-btn .count{font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:999px;background:rgba(0,0,0,.08);color:var(--ink-3);min-width:18px;text-align:center}
 .news-filter-btn.active .count{background:rgba(184,149,103,.85);color:var(--navy)}
-
-/* Featured (latest) post — large card */
-.news-featured{
-  display:grid;grid-template-columns:1.1fr 1fr;gap:0;
-  background:#fff;border:1px solid var(--line);border-radius:14px;
-  overflow:hidden;margin-bottom:56px;
-  transition:transform .35s cubic-bezier(.2,.8,.2,1), border-color .25s ease, box-shadow .35s ease;
-  text-decoration:none;color:inherit;
-  position:relative;
-}
+.news-featured{display:grid;grid-template-columns:1.1fr 1fr;gap:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:56px;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .25s ease,box-shadow .35s ease;text-decoration:none;color:inherit;position:relative}
 .news-featured:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 24px 48px -16px rgba(10,37,64,.18)}
-.news-featured-badge{
-  position:absolute;top:24px;left:24px;z-index:2;
-  display:inline-flex;align-items:center;gap:6px;
-  padding:6px 12px;border-radius:999px;
-  background:rgba(10,37,64,.85);color:var(--gold);
-  font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;
-  backdrop-filter:blur(10px);
-}
+.news-featured-badge{position:absolute;top:24px;left:24px;z-index:2;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(10,37,64,.85);color:var(--gold);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;backdrop-filter:blur(10px)}
 .news-featured-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(184,149,103,.25)}
-.news-featured-cover{
-  aspect-ratio:16/11;position:relative;overflow:hidden;
-  background:linear-gradient(135deg, var(--navy) 0%, #143a66 60%, #1F5FA8 100%);
-}
-.news-featured-cover-pattern{position:absolute;inset:0;
-  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
-  background-size:48px 48px;
-  mask-image:radial-gradient(ellipse at center, #000 30%, transparent 75%);-webkit-mask-image:radial-gradient(ellipse at center, #000 30%, transparent 75%);
-}
-.news-featured-cover-letter{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-family:'Instrument Serif',serif;font-style:italic;font-size:200px;
-  color:rgba(184,149,103,.30);letter-spacing:-0.04em;
-}
+.news-featured-cover{aspect-ratio:16/11;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--navy) 0%,#143a66 60%,#1F5FA8 100%)}
+.news-featured-cover-pattern{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse at center,#000 30%,transparent 75%)}
+.news-featured-cover-letter{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-style:italic;font-size:200px;color:rgba(184,149,103,.30);letter-spacing:-0.04em}
 .news-featured-orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.4}
 .news-featured-orb.a{width:240px;height:240px;background:#B89567;top:-30%;right:-10%}
 .news-featured-orb.b{width:180px;height:180px;background:#7A4FCF;bottom:-20%;left:10%}
 .news-featured-body{padding:40px 44px;display:flex;flex-direction:column;justify-content:center;gap:14px}
-.news-featured-tag{
-  display:inline-block;align-self:flex-start;
-  font-size:10.5px;letter-spacing:.22em;font-weight:600;text-transform:uppercase;
-  color:var(--gold-deep);background:var(--gold-soft);padding:5px 10px;border-radius:3px;
-}
+.news-featured-tag{display:inline-block;align-self:flex-start;font-size:10.5px;letter-spacing:.22em;font-weight:600;text-transform:uppercase;color:var(--gold-deep);background:var(--gold-soft);padding:5px 10px;border-radius:3px}
 .news-featured-title{font-size:28px;color:var(--navy);font-weight:700;line-height:1.28;letter-spacing:-0.015em;margin:0;word-break:keep-all}
 .news-featured-excerpt{font-size:15px;color:var(--ink-3);line-height:1.7;word-break:keep-all}
-.news-featured-meta{
-  display:flex;justify-content:space-between;align-items:center;
-  padding-top:18px;margin-top:6px;border-top:1px solid var(--line-2);
-  font-size:12.5px;color:var(--ink-3);
-}
+.news-featured-meta{display:flex;justify-content:space-between;align-items:center;padding-top:18px;margin-top:6px;border-top:1px solid var(--line-2);font-size:12.5px;color:var(--ink-3)}
 .news-featured-meta strong{color:var(--navy);font-weight:600;font-size:13px;letter-spacing:.04em}
-.news-featured-arrow{
-  width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;
-  display:inline-flex;align-items:center;justify-content:center;
-  transition:background .25s ease,transform .35s cubic-bezier(.2,.8,.2,1);
-}
+.news-featured-arrow{width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;display:inline-flex;align-items:center;justify-content:center;transition:background .25s ease,transform .35s cubic-bezier(.2,.8,.2,1)}
 .news-featured:hover .news-featured-arrow{background:var(--gold);transform:translateX(4px)}
 .news-featured-arrow svg{width:14px;height:14px}
-
-@media (max-width:860px){
-  .news-featured{grid-template-columns:1fr}
-  .news-featured-body{padding:32px 28px}
-  .news-featured-title{font-size:22px}
-  .news-featured-cover-letter{font-size:140px}
-}
-
-/* Section divider */
-.news-divider{
-  display:flex;align-items:center;gap:18px;margin:0 0 36px;
-}
-.news-divider::before,.news-divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg, transparent, var(--line), transparent)}
+@media (max-width:860px){.news-featured{grid-template-columns:1fr}.news-featured-body{padding:32px 28px}.news-featured-title{font-size:22px}.news-featured-cover-letter{font-size:140px}}
+.news-divider{display:flex;align-items:center;gap:18px;margin:0 0 36px}
+.news-divider::before,.news-divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
 .news-divider-text{font-family:'Instrument Serif',serif;font-style:italic;font-size:18px;color:var(--gold);letter-spacing:-0.005em}
-
-/* Grid */
 .news-list{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
 @media (max-width:960px){.news-list{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.news-list{grid-template-columns:1fr;gap:18px}}
-
-.news-card{
-  background:#fff;border:1px solid var(--line);border-radius:12px;
-  overflow:hidden;display:flex;flex-direction:column;
-  transition:transform .35s cubic-bezier(.2,.8,.2,1), border-color .25s ease, box-shadow .35s ease;
-  text-decoration:none;color:inherit;
-  position:relative;
-}
+.news-card{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .25s ease,box-shadow .35s ease;text-decoration:none;color:inherit;position:relative}
 .news-card:hover{transform:translateY(-6px);border-color:var(--gold);box-shadow:0 20px 40px -16px rgba(10,37,64,.18)}
-.news-card::before{
-  content:"";position:absolute;top:0;left:0;width:0;height:2px;
-  background:linear-gradient(90deg, var(--gold), transparent);
-  transition:width .55s cubic-bezier(.2,.8,.2,1);z-index:2;
-}
+.news-card::before{content:"";position:absolute;top:0;left:0;width:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);transition:width .55s cubic-bezier(.2,.8,.2,1);z-index:2}
 .news-card:hover::before{width:50%}
-.news-card-cover{
-  aspect-ratio:16/10;position:relative;overflow:hidden;
-  background:linear-gradient(135deg, var(--navy) 0%, #143a66 100%);
-}
-.news-card-pattern{position:absolute;inset:0;
-  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
-  background-size:36px 36px;
-  mask-image:radial-gradient(ellipse at center, #000 30%, transparent 75%);
-}
-.news-card-letter{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-family:'Instrument Serif',serif;font-style:italic;font-size:96px;
-  color:rgba(184,149,103,.35);letter-spacing:-0.04em;line-height:1;
-  transition:transform .5s cubic-bezier(.2,.8,.2,1);
-}
+.news-card-cover{aspect-ratio:16/10;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--navy) 0%,#143a66 100%)}
+.news-card-pattern{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:36px 36px;mask-image:radial-gradient(ellipse at center,#000 30%,transparent 75%)}
+.news-card-letter{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-style:italic;font-size:96px;color:rgba(184,149,103,.35);letter-spacing:-0.04em;line-height:1;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 .news-card:hover .news-card-letter{transform:scale(1.08)}
 .news-card-orb{position:absolute;width:160px;height:160px;border-radius:50%;filter:blur(50px);opacity:.45;top:-20%;right:-20%}
-
 .news-card-body{padding:24px 24px 28px;display:flex;flex-direction:column;flex:1;gap:12px}
-.news-card-tag{
-  display:inline-block;align-self:flex-start;
-  font-size:10px;letter-spacing:.20em;font-weight:600;text-transform:uppercase;
-  color:var(--gold-deep);background:var(--gold-soft);padding:4px 9px;border-radius:3px;
-}
-.news-card-title{font-size:17px;color:var(--navy);font-weight:700;line-height:1.38;letter-spacing:-0.01em;margin:0;word-break:keep-all;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-}
-.news-card-excerpt{font-size:13.5px;color:var(--ink-3);line-height:1.66;flex:1;word-break:keep-all;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
-}
+.news-card-tag{display:inline-block;align-self:flex-start;font-size:10px;letter-spacing:.20em;font-weight:600;text-transform:uppercase;color:var(--gold-deep);background:var(--gold-soft);padding:4px 9px;border-radius:3px}
+.news-card-title{font-size:17px;color:var(--navy);font-weight:700;line-height:1.38;letter-spacing:-0.01em;margin:0;word-break:keep-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news-card-excerpt{font-size:13.5px;color:var(--ink-3);line-height:1.66;flex:1;word-break:keep-all;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .news-card-meta{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--line-2);font-size:11.5px;color:var(--ink-4);letter-spacing:.04em}
 .news-card-read{display:inline-flex;align-items:center;gap:4px;color:var(--ink-3);font-weight:600;font-size:11.5px;transition:color .2s ease,transform .35s cubic-bezier(.2,.8,.2,1)}
 .news-card:hover .news-card-read{color:var(--gold-deep);transform:translateX(3px)}
-
-/* Color variants for cover backgrounds */
 .cover-v1{background:linear-gradient(135deg,#0A2540,#143a66 60%,#1F5FA8)}
 .cover-v2{background:linear-gradient(135deg,#3a2c1c,#8E6E45 50%,#B89567)}
 .cover-v3{background:linear-gradient(135deg,#0A2540,#4a2b7a)}
 .cover-v4{background:linear-gradient(135deg,#143a66,#0A2540)}
 .cover-v5{background:linear-gradient(135deg,#1F5FA8,#102B4E)}
 .cover-v6{background:linear-gradient(135deg,#0A2540,#143a66 50%,#7A4FCF)}
-
-/* Empty / loading states */
-.news-empty,.news-loading{
-  text-align:center;padding:80px 20px;
-  font-size:14.5px;color:var(--ink-3);
-}
-.news-loading .spinner{
-  display:inline-block;width:18px;height:18px;border-radius:50%;
-  border:2px solid var(--line);border-top-color:var(--gold);
-  animation:spin .9s linear infinite;margin-right:10px;vertical-align:middle;
-}
+.news-empty,.news-loading{text-align:center;padding:80px 20px;font-size:14.5px;color:var(--ink-3)}
+.news-loading .spinner{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--gold);animation:spin .9s linear infinite;margin-right:10px;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
-.news-empty-mark{
-  font-family:'Instrument Serif',serif;font-style:italic;font-size:64px;
-  color:var(--gold);opacity:.4;margin-bottom:14px;letter-spacing:-0.04em;
-}
-
-/* Loading skeleton */
-.news-skel-card{
-  background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;
-}
-.news-skel-cover{aspect-ratio:16/10;background:linear-gradient(90deg, #f0f1ee 0%, #f7f8f5 50%, #f0f1ee 100%);background-size:200% 100%;animation:skel 1.5s linear infinite}
-.news-skel-body{padding:24px}
-.news-skel-line{height:12px;background:linear-gradient(90deg, #f0f1ee 0%, #f7f8f5 50%, #f0f1ee 100%);background-size:200% 100%;animation:skel 1.5s linear infinite;border-radius:4px;margin-bottom:10px}
-.news-skel-line.w-60{width:60%}
-.news-skel-line.w-80{width:80%}
-.news-skel-line.w-40{width:40%}
-@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-/* CTA at bottom */
-.news-bottom-cta{
-  margin-top:80px;padding:48px 40px;
-  background:linear-gradient(135deg, var(--navy) 0%, #143a66 100%);
-  border-radius:var(--r-xl);color:#fff;text-align:center;
-  position:relative;overflow:hidden;
-}
+.news-empty-mark{font-family:'Instrument Serif',serif;font-style:italic;font-size:64px;color:var(--gold);opacity:.4;margin-bottom:14px;letter-spacing:-0.04em}
+.news-bottom-cta{margin-top:80px;padding:48px 40px;background:linear-gradient(135deg,var(--navy) 0%,#143a66 100%);border-radius:var(--r-xl);color:#fff;text-align:center;position:relative;overflow:hidden}
 .news-bottom-cta::before{content:"";position:absolute;top:-50%;right:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(184,149,103,.18) 0%,transparent 60%);pointer-events:none}
 .news-bottom-cta h3{color:#fff;font-size:clamp(22px,2.8vw,32px);margin:0 0 12px;letter-spacing:-0.02em;line-height:1.25;font-weight:700;position:relative}
 .news-bottom-cta h3 em{font-family:'Instrument Serif',serif;font-style:italic;color:var(--gold);font-weight:400}
 .news-bottom-cta p{color:rgba(255,255,255,.85);font-size:15px;line-height:1.7;max-width:48ch;margin:0 auto 28px;position:relative}
 .news-bottom-cta .btn{position:relative}
-
-@media (max-width:640px){
-  .news-bottom-cta{padding:36px 24px;margin-top:56px}
-}
+@media (max-width:640px){.news-bottom-cta{padding:36px 24px;margin-top:56px}}
 </style>
 </head>
 <body>
@@ -237,7 +102,6 @@
 
 <main>
 
-<!-- Page Hero -->
 <section class="page-hero">
   <div class="aurora" aria-hidden="true">
     <div class="aurora-orb o1"></div><div class="aurora-orb o2"></div><div class="aurora-orb o3"></div><div class="aurora-orb o4"></div>
@@ -251,52 +115,33 @@
       <line class="c-line l1" x1="120" y1="80" x2="380" y2="180"/>
       <line class="c-line l2" x1="380" y1="180" x2="640" y2="120"/>
       <line class="c-line l3" x1="640" y1="120" x2="920" y2="240"/>
-      <line class="c-line l1" x1="200" y1="380" x2="500" y2="440"/>
-      <line class="c-line l2" x1="500" y1="440" x2="780" y2="380"/>
       <circle class="c-dot" cx="120" cy="80" r="3"/>
       <circle class="c-dot d2" cx="380" cy="180" r="3"/>
       <circle class="c-dot d3" cx="640" cy="120" r="3"/>
       <circle class="c-dot d4" cx="920" cy="240" r="3"/>
-      <circle class="c-dot d2" cx="200" cy="380" r="3"/>
-      <circle class="c-dot d5" cx="500" cy="440" r="3"/>
     </svg>
   </div>
   <div class="container page-hero-inner">
     <div class="eyebrow-mag" style="justify-content:center;color:var(--gold)"><span class="num">News</span><span data-lang="ko">우리의 소식</span><span data-lang="en">Our Notes</span></div>
     <h1><span data-lang="ko">K-메디컬의 다음 챕터,<br><em>한 편씩 쌓아 갑니다</em></span><span data-lang="en">The next chapter of K-Medical,<br><em>one note at a time</em></span></h1>
     <p data-lang="ko">광고가 아닌 자산이 되는 콘텐츠를 만드는 우리의 관점,<br class="br-ko-only">그리고 그것이 실제로 어떻게 작동했는지의 기록.</p>
-    <p data-lang="en">Our perspective on content that becomes an asset, not an ad —<br>and the proof of how it works.</p>
+    <p data-lang="en">Our perspective on content that becomes an asset, not an ad — and the proof of how it works.</p>
   </div>
 </section>
 
-<!-- News list -->
 <section class="section">
   <div class="container">
-
-    <!-- Category filter -->
-    <div id="news-filter" class="news-filter">
-      <!-- populated by JS -->
-    </div>
-
-    <!-- Featured (first/latest) -->
+    <div id="news-filter" class="news-filter"></div>
     <div id="news-featured-slot"></div>
-
-    <!-- Divider -->
     <div id="news-rest-divider" class="news-divider" style="display:none">
       <span class="news-divider-text" data-lang="ko">이어 읽기</span>
       <span class="news-divider-text" data-lang="en">Keep reading</span>
     </div>
-
-    <!-- Grid -->
     <div id="news-list" class="news-list"></div>
-
-    <!-- Loading state -->
     <div id="news-loading" class="news-loading">
       <span class="spinner"></span>
       <span data-lang="ko">불러오는 중…</span><span data-lang="en">Loading…</span>
     </div>
-
-    <!-- Empty state -->
     <div id="news-empty" class="news-empty" style="display:none">
       <div class="news-empty-mark">—</div>
       <p data-lang="ko" style="font-size:17px;color:var(--navy);font-weight:600;margin-bottom:8px">아직 발행된 글이 없습니다</p>
@@ -304,8 +149,6 @@
       <p data-lang="ko">곧 K-메디컬의 다음 챕터를 함께 기록하겠습니다.</p>
       <p data-lang="en">Soon we'll begin writing the next chapter of K-Medical.</p>
     </div>
-
-    <!-- Bottom CTA -->
     <div class="news-bottom-cta" data-reveal>
       <h3><span data-lang="ko">먼저 채널 진단부터,<br><em>그 다음 운영을 이야기합니다</em></span><span data-lang="en">Start with a <em>channel diagnosis</em>,<br>then operate</span></h3>
       <p data-lang="ko">병원의 단계와 목표를 알려 주시면, 24시간 안에 1:1로 회신드립니다.</p>
@@ -314,7 +157,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </div>
-
   </div>
 </section>
 
@@ -370,42 +212,25 @@
   const loading = document.getElementById('news-loading');
   const empty = document.getElementById('news-empty');
   const divider = document.getElementById('news-rest-divider');
-
   const TAG_LABELS = {
-    all:          { ko:'전체',       en:'All' },
-    announcement: { ko:'발표',       en:'Announcement' },
-    methodology:  { ko:'방법론',     en:'Methodology' },
-    case:         { ko:'사례',       en:'Case' },
-    medical:      { ko:'의료',       en:'Medical' },
-    news:         { ko:'뉴스',       en:'News' },
+    all: { ko:'전체', en:'All' },
+    announcement: { ko:'발표', en:'Announcement' },
+    methodology: { ko:'방법론', en:'Methodology' },
+    case: { ko:'사례', en:'Case' },
+    medical: { ko:'의료', en:'Medical' },
+    news: { ko:'뉴스', en:'News' },
   };
-
   function lang(){ return document.documentElement.lang || 'ko'; }
-
   function escape(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
-
-  function fmtDate(iso, l){
-    if (!iso) return '';
-    return new Date(iso).toLocaleDateString(l==='ko'?'ko-KR':'en-US', { year:'numeric', month:'short', day:'numeric' });
-  }
-
-  function readMinutes(body){
-    if (!body) return 1;
-    const chars = body.length;
-    return Math.max(1, Math.round(chars / 500));
-  }
-
-  function coverVariant(slug){
-    const sum = (slug || '').split('').reduce((a,c)=>a+c.charCodeAt(0),0);
-    return 'cover-v' + ((sum % 6) + 1);
-  }
+  function fmtDate(iso, l){ if (!iso) return ''; return new Date(iso).toLocaleDateString(l==='ko'?'ko-KR':'en-US',{year:'numeric',month:'short',day:'numeric'}); }
+  function readMinutes(body){ if (!body) return 1; return Math.max(1, Math.round(body.length / 500)); }
+  function coverVariant(slug){ const sum = (slug||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0); return 'cover-v' + ((sum % 6) + 1); }
 
   let posts = [];
   let currentFilter = 'all';
 
   try {
-    posts = await SB.sbSelect('blog_posts',
-      '?select=slug,title_ko,title_en,excerpt_ko,excerpt_en,cover_url,tag,published_at,body_ko,body_en,status&status=eq.published&order=published_at.desc');
+    posts = await SB.sbSelect('blog_posts','?select=slug,title_ko,title_en,excerpt_ko,excerpt_en,cover_url,tag,published_at,body_ko,body_en,status&status=eq.published&order=published_at.desc');
     loading.style.display = 'none';
     if (!posts.length) { empty.style.display = 'block'; return; }
     renderFilters();
@@ -436,20 +261,10 @@
   function render(){
     const l = lang();
     const filtered = currentFilter === 'all' ? posts : posts.filter(p => p.tag === currentFilter);
-
-    if (!filtered.length){
-      featuredSlot.innerHTML = '';
-      list.innerHTML = '';
-      divider.style.display = 'none';
-      empty.style.display = 'block';
-      return;
-    }
+    if (!filtered.length){ featuredSlot.innerHTML = ''; list.innerHTML = ''; divider.style.display = 'none'; empty.style.display = 'block'; return; }
     empty.style.display = 'none';
-
     const featured = filtered[0];
     const rest = filtered.slice(1);
-
-    // FEATURED
     const fTitle = (l==='ko' ? featured.title_ko : (featured.title_en || featured.title_ko)) || '';
     const fExcerpt = (l==='ko' ? featured.excerpt_ko : (featured.excerpt_en || featured.excerpt_ko)) || '';
     const fBody = l==='ko' ? featured.body_ko : (featured.body_en || featured.body_ko);
@@ -457,13 +272,12 @@
     const fCover = featured.cover_url
       ? `<div class="news-featured-cover" style="background-image:url('${featured.cover_url}');background-size:cover;background-position:center"></div>`
       : `<div class="news-featured-cover ${coverVariant(featured.slug)}">
-            <div class="news-featured-orb a"></div>
-            <div class="news-featured-orb b"></div>
-            <div class="news-featured-cover-pattern"></div>
-            <div class="news-featured-cover-letter">${escape(fInitial)}</div>
+           <div class="news-featured-orb a"></div>
+           <div class="news-featured-orb b"></div>
+           <div class="news-featured-cover-pattern"></div>
+           <div class="news-featured-cover-letter">${escape(fInitial)}</div>
          </div>`;
     const fTagLabel = (TAG_LABELS[featured.tag] && TAG_LABELS[featured.tag][l]) || featured.tag || '';
-
     featuredSlot.innerHTML = `
       <a class="news-featured" href="blog-post.html?slug=${encodeURIComponent(featured.slug)}" data-reveal>
         <span class="news-featured-badge">${l==='ko'?'최신 글':'Latest'}</span>
@@ -478,22 +292,19 @@
           </div>
         </div>
       </a>`;
-
-    // REST GRID
     if (rest.length){
       divider.style.display = 'flex';
       list.innerHTML = rest.map(p => {
         const title = (l==='ko' ? p.title_ko : (p.title_en || p.title_ko)) || '';
         const excerpt = (l==='ko' ? p.excerpt_ko : (p.excerpt_en || p.excerpt_ko)) || '';
         const initial = (title || '?').slice(0,1);
-        const body = l==='ko' ? p.body_ko : (p.body_en || p.body_ko);
         const tagLabel = (TAG_LABELS[p.tag] && TAG_LABELS[p.tag][l]) || p.tag || '';
         const cover = p.cover_url
           ? `<div class="news-card-cover" style="background-image:url('${p.cover_url}');background-size:cover;background-position:center"></div>`
           : `<div class="news-card-cover ${coverVariant(p.slug)}">
-                <div class="news-card-orb" style="background:${['#B89567','#7A4FCF','#1F5FA8','#14B8A6'][Math.abs(p.slug.charCodeAt(0)) % 4]}"></div>
-                <div class="news-card-pattern"></div>
-                <div class="news-card-letter">${escape(initial)}</div>
+               <div class="news-card-orb" style="background:${['#B89567','#7A4FCF','#1F5FA8','#14B8A6'][Math.abs(p.slug.charCodeAt(0)) % 4]}"></div>
+               <div class="news-card-pattern"></div>
+               <div class="news-card-letter">${escape(initial)}</div>
              </div>`;
         return `
           <a class="news-card" href="blog-post.html?slug=${encodeURIComponent(p.slug)}" data-reveal>
@@ -509,21 +320,11 @@
             </div>
           </a>`;
       }).join('');
-    } else {
-      divider.style.display = 'none';
-      list.innerHTML = '';
-    }
-
-    // Mark dynamic items as visible
-    requestAnimationFrame(() => {
-      document.querySelectorAll('#news-featured-slot [data-reveal], #news-list [data-reveal]').forEach(el => el.classList.add('in'));
-    });
+    } else { divider.style.display = 'none'; list.innerHTML = ''; }
+    requestAnimationFrame(() => { document.querySelectorAll('#news-featured-slot [data-reveal], #news-list [data-reveal]').forEach(el => el.classList.add('in')); });
   }
 
-  // Re-render on language toggle
-  document.querySelectorAll('.lang-btn').forEach(b =>
-    b.addEventListener('click', () => setTimeout(() => { renderFilters(); render(); }, 100))
-  );
+  document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => setTimeout(() => { renderFilters(); render(); }, 100)));
 })();
 </script>
 </body>

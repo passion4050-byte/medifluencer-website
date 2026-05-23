@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>블로그 — Medifluencer</title>
+<title>우리의 소식 — Medifluencer</title>
 <meta name="description" id="metaDesc" content="GINCON과 함께하는 의료 전문 인플루언서 그룹.">
 <meta property="og:type" content="article">
-<meta property="og:title" id="ogTitle" content="블로그 — Medifluencer">
+<meta property="og:title" id="ogTitle" content="우리의 소식 — Medifluencer">
 <meta property="og:description" id="ogDesc" content="GINCON과 함께하는 의료 전문 인플루언서 그룹.">
 <meta property="og:image" id="ogImage" content="">
 <meta property="og:site_name" content="Medifluencer">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" id="twTitle" content="블로그 — Medifluencer">
-<meta name="twitter:description" id="twDesc" content="GINCON과 함께하는 의료 전문 인플루언서 그룹.">
+<meta name="twitter:title" id="twTitle" content="우리의 소식 — Medifluencer">
+<meta name="twitter:description" id="twDesc" content="">
 <meta name="twitter:image" id="twImage" content="">
 <link rel="canonical" id="canonical" href="">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,9 +23,9 @@
 .post-wrap{max-width:760px;margin:0 auto;padding:0 24px}
 .post-header{padding:120px 0 48px;text-align:center;position:relative}
 .post-tag{display:inline-block;font-size:11px;letter-spacing:.24em;font-weight:600;text-transform:uppercase;color:var(--gold-deep);background:var(--gold-soft);padding:6px 12px;border-radius:3px;margin-bottom:24px}
-.post-title{font-size:clamp(28px, 4vw, 48px);line-height:1.18;letter-spacing:-0.025em;color:var(--navy);margin-bottom:18px}
+.post-title{font-size:clamp(28px,4vw,48px);line-height:1.18;letter-spacing:-0.025em;color:var(--navy);margin-bottom:18px;word-break:keep-all}
 .post-meta{font-size:13.5px;color:var(--ink-3);letter-spacing:.04em}
-.post-cover{aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:linear-gradient(135deg, var(--navy) 0%, #143a66 100%);margin:0 auto 48px;max-width:920px;position:relative}
+.post-cover{aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,var(--navy) 0%,#143a66 100%);margin:0 auto 48px;max-width:920px;position:relative}
 .post-cover-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-style:italic;font-size:140px;color:rgba(184,149,103,.45);letter-spacing:-0.04em}
 .post-body{font-size:17.5px;line-height:1.85;color:var(--ink-2);word-break:keep-all}
 .post-body h2{font-size:26px;margin:48px 0 18px;color:var(--navy);line-height:1.3}
@@ -34,14 +34,33 @@
 .post-body ul, .post-body ol{padding-left:1.4em;margin-bottom:20px}
 .post-body li{margin-bottom:8px}
 .post-body strong{color:var(--navy);font-weight:600}
-.post-body a{color:var(--blue);border-bottom:1px solid var(--gold)}
+.post-body a{color:var(--blue);border-bottom:1px solid var(--gold);font-weight:500}
+.post-body a:hover{color:var(--gold-deep)}
 .post-body blockquote{border-left:3px solid var(--gold);padding:6px 22px;margin:32px 0;font-family:'Instrument Serif',serif;font-style:italic;font-size:20px;line-height:1.6;color:var(--navy)}
 .post-body code{background:var(--bg-soft);padding:2px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:.92em;color:var(--gold-deep)}
-.post-divider{display:flex;align-items:center;justify-content:center;gap:14px;margin:64px 0 48px}
+.post-divider{display:flex;align-items:center;justify-content:center;gap:14px;margin:64px 0 0}
 .post-divider::before,.post-divider::after{content:"";flex:0 1 80px;height:1px;background:var(--gold);opacity:.6}
 .post-divider svg{width:18px;height:18px;color:var(--gold)}
 .post-back{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-3);padding:48px 0 80px}
 .post-back:hover{color:var(--navy)}
+
+/* Bottom CTA */
+.post-bottom-cta{margin:64px auto 0;max-width:760px;padding:0 24px}
+.post-bottom-cta-inner{background:linear-gradient(135deg,var(--navy) 0%,#143a66 100%);border-radius:var(--r-xl);padding:48px 44px;color:#fff;position:relative;overflow:hidden}
+.post-bottom-cta-inner::before{content:"";position:absolute;top:-50%;right:-10%;width:380px;height:380px;background:radial-gradient(circle,rgba(184,149,103,.18) 0%,transparent 60%);pointer-events:none}
+.post-bottom-cta-inner::after{content:"";position:absolute;bottom:-30%;left:-15%;width:300px;height:300px;background:radial-gradient(circle,rgba(31,95,168,.16) 0%,transparent 60%);pointer-events:none}
+.post-bottom-cta .label{display:inline-block;font-size:10.5px;letter-spacing:.32em;color:var(--gold);font-weight:600;text-transform:uppercase;margin-bottom:18px;position:relative}
+.post-bottom-cta h3{font-size:clamp(22px,3vw,30px);color:#fff;font-weight:700;line-height:1.3;letter-spacing:-0.02em;margin:0 0 14px;position:relative;word-break:keep-all}
+.post-bottom-cta h3 em{font-family:'Instrument Serif',serif;font-style:italic;color:var(--gold);font-weight:400}
+.post-bottom-cta p{color:rgba(255,255,255,.88);font-size:15.5px;line-height:1.7;margin:0 0 28px;max-width:48ch;position:relative;word-break:keep-all}
+.post-bottom-cta .cta-row{display:flex;gap:12px;flex-wrap:wrap;position:relative}
+.post-bottom-cta .btn{padding:14px 26px;font-size:14.5px}
+@media (max-width:640px){
+  .post-header{padding:96px 0 36px}
+  .post-bottom-cta-inner{padding:32px 24px}
+  .post-bottom-cta .cta-row{flex-direction:column;align-items:stretch}
+  .post-bottom-cta .btn{justify-content:center;width:100%}
+}
 </style>
 </head>
 <body>
@@ -81,6 +100,28 @@
     <div class="post-divider">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
     </div>
+  </div>
+
+  <div class="post-bottom-cta">
+    <div class="post-bottom-cta-inner">
+      <span class="label" data-lang="ko">함께 만들어 가기</span>
+      <span class="label" data-lang="en">Work With Us</span>
+      <h3>
+        <span data-lang="ko">병원의 <em>다음 시즌</em>을<br>함께 시작합니다</span>
+        <span data-lang="en">Begin your <em>next season</em>,<br>together</span>
+      </h3>
+      <p data-lang="ko">읽으신 관점에 공감하셨다면, 한 번의 미팅으로 채널 진단부터 시작해 보세요. 24시간 안에 1:1로 회신드립니다.</p>
+      <p data-lang="en">If this perspective resonates, start with a single meeting — a channel diagnosis. We reply 1:1 within 24 hours.</p>
+      <div class="cta-row">
+        <a class="btn btn-gold" href="contact.html"><span data-lang="ko">협업 문의하기</span><span data-lang="en">Begin a Conversation</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn btn-ghost on-dark" href="blog.html"><span data-lang="ko">다른 글 둘러보기</span><span data-lang="en">More Stories</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="post-wrap">
     <a href="blog.html" class="post-back link-edit">← <span data-lang="ko">목록으로 돌아가기</span><span data-lang="en">Back to list</span></a>
   </div>
 </article>
@@ -92,7 +133,7 @@
 <div id="post-404" style="display:none;text-align:center;padding:160px 0">
   <h2 style="margin-bottom:14px"><span data-lang="ko">글을 찾을 수 없습니다</span><span data-lang="en">Post not found</span></h2>
   <p style="color:var(--ink-3);margin-bottom:24px"><span data-lang="ko">삭제되었거나 발행 전 상태일 수 있습니다.</span><span data-lang="en">It may be deleted or unpublished.</span></p>
-  <a href="blog.html" class="btn btn-ghost"><span data-lang="ko">블로그 목록</span><span data-lang="en">Back to Blog</span></a>
+  <a href="blog.html" class="btn btn-ghost"><span data-lang="ko">우리의 소식 목록</span><span data-lang="en">Back to News</span></a>
 </div>
 
 </main>
@@ -108,7 +149,7 @@
       <div class="footer-col"><h4><span data-lang="ko">메뉴</span><span data-lang="en">Navigate</span></h4>
         <ul>
           <li><a href="index.html"><span data-lang="ko">홈</span><span data-lang="en">Home</span></a></li>
-          <li><a href="blog.html"><span data-lang="ko">블로그</span><span data-lang="en">Blog</span></a></li>
+          <li><a href="blog.html"><span data-lang="ko">우리의 소식</span><span data-lang="en">News</span></a></li>
           <li><a href="services.html"><span data-lang="ko">서비스</span><span data-lang="en">Services</span></a></li>
         </ul>
       </div>
@@ -129,7 +170,6 @@
 <script src="assets/supabase.js"></script>
 <script src="assets/main.js"></script>
 <script>
-// Minimal markdown renderer (subset: headings, bold, italic, links, ul/ol, hr, blockquote, paragraphs)
 function mdToHtml(md) {
   if (!md) return '';
   const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
@@ -138,12 +178,11 @@ function mdToHtml(md) {
   let inList = null;
   for (let i = 0; i < lines.length; i++) {
     let ln = lines[i];
-    // headings
     let m;
     if ((m = ln.match(/^### (.*)/))) { if (inList) { out.push(`</${inList}>`); inList=null; } out.push(`<h3>${esc(m[1])}</h3>`); continue; }
     if ((m = ln.match(/^## (.*)/)))  { if (inList) { out.push(`</${inList}>`); inList=null; } out.push(`<h2>${esc(m[1])}</h2>`); continue; }
     if ((m = ln.match(/^# (.*)/)))   { if (inList) { out.push(`</${inList}>`); inList=null; } out.push(`<h2>${esc(m[1])}</h2>`); continue; }
-    if (ln.match(/^---\s*$/))         { if (inList) { out.push(`</${inList}>`); inList=null; } out.push('<hr>'); continue; }
+    if (ln.match(/^---\s*$/))       { if (inList) { out.push(`</${inList}>`); inList=null; } out.push('<hr>'); continue; }
     if (ln.match(/^> (.*)/))         { if (inList) { out.push(`</${inList}>`); inList=null; } out.push(`<blockquote>${esc(ln.slice(2))}</blockquote>`); continue; }
     if ((m = ln.match(/^[-*] (.*)/))){
       if (inList !== 'ul') { if (inList) out.push(`</${inList}>`); out.push('<ul>'); inList='ul'; }
@@ -153,22 +192,21 @@ function mdToHtml(md) {
       if (inList !== 'ol') { if (inList) out.push(`</${inList}>`); out.push('<ol>'); inList='ol'; }
       out.push(`<li>${inline(esc(m[2]))}</li>`); continue;
     }
-    if (!ln.trim()) {
-      if (inList) { out.push(`</${inList}>`); inList=null; }
-      continue;
-    }
+    if (!ln.trim()) { if (inList) { out.push(`</${inList}>`); inList=null; } continue; }
     if (inList) { out.push(`</${inList}>`); inList=null; }
     out.push(`<p>${inline(esc(ln))}</p>`);
   }
   if (inList) out.push(`</${inList}>`);
   return out.join('\n');
-
   function inline(s){
     return s
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
       .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/\[(.+?)\]\((https?:[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      .replace(/\[(.+?)\]\(([^)]+)\)/g, (m, txt, url) => {
+        const isExternal = /^https?:/.test(url);
+        return `<a href="${url}"${isExternal ? ' target="_blank" rel="noopener"' : ''}>${txt}</a>`;
+      });
   }
 }
 
@@ -190,7 +228,6 @@ function mdToHtml(md) {
     const excerpt = lang === 'ko' ? p.excerpt_ko : (p.excerpt_en || p.excerpt_ko);
     document.title = `${title} — Medifluencer`;
 
-    // SEO · dynamic meta tags
     const fullTitle = `${title} — Medifluencer`;
     const desc = excerpt || (body || '').slice(0, 155);
     document.getElementById('metaDesc').setAttribute('content', desc);
@@ -204,16 +241,13 @@ function mdToHtml(md) {
     }
     document.getElementById('canonical').setAttribute('href', location.origin + location.pathname + '?slug=' + encodeURIComponent(p.slug));
 
-    // JSON-LD structured data for better SEO
     const ld = document.createElement('script');
     ld.type = 'application/ld+json';
     ld.textContent = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "BlogPosting",
-      "headline": title,
-      "description": desc,
-      "datePublished": p.published_at,
-      "dateModified": p.updated_at,
+      "headline": title, "description": desc,
+      "datePublished": p.published_at, "dateModified": p.updated_at,
       "author": { "@type": "Organization", "name": "Medifluencer", "url": location.origin },
       "publisher": { "@type": "Organization", "name": "Medifluencer · with GINCON" },
       "image": p.cover_url || undefined,
