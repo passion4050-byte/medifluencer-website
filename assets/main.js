@@ -18,6 +18,12 @@
     triggerGoogleTranslate(lang);
   }
   function initLang(){
+    // Force both lang buttons visible regardless of CSS conflicts
+    document.querySelectorAll('.lang-btn').forEach(b=>{
+      b.style.display='inline-flex';
+      b.style.visibility='visible';
+      b.style.opacity='1';
+    });
     let s=null; try{s=localStorage.getItem('mf_lang');}catch(e){}
     const init = s || (navigator.language && navigator.language.startsWith('en') ? 'en':'ko');
     setLang(init);
@@ -173,9 +179,10 @@
     });
   }
 
-  // ---- Scroll drift ----
+  // ---- Scroll drift (skip on touch — causes jank on mobile) ----
   function initScrollDrift(){
-    if (REDUCED) return;
+    if (REDUCED || COARSE) return;
+    if (window.innerWidth < 769) return;
     let ticking=false;
     const up=()=>{ document.documentElement.style.setProperty('--sy', window.scrollY); ticking=false; };
     window.addEventListener('scroll',()=>{ if(!ticking){ requestAnimationFrame(up); ticking=true; } },{passive:true});

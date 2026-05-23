@@ -1628,3 +1628,225 @@ body{top:0 !important;position:static !important}
 .site-header:not(.is-dark) .lang-btn:not(.active){color:var(--ink-3)}
 .lang-btn:not(.active):hover{color:#fff}
 .site-header:not(.is-dark) .lang-btn:not(.active):hover{color:var(--navy)}
+
+
+/* ============================================
+   LANG TOGGLE — STRONGER FIX (both buttons always visible)
+   ============================================ */
+.lang-toggle{
+  display:inline-flex !important;
+  align-items:center !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  gap:2px !important;
+  flex-shrink:0 !important;
+  padding:3px !important;
+  border-radius:999px !important;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+}
+.site-header:not(.is-dark) .lang-toggle{
+  background:var(--bg-soft);
+  border-color:var(--line);
+}
+
+.lang-toggle .lang-btn,
+.lang-btn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  min-width:38px !important;
+  height:28px !important;
+  padding:0 11px !important;
+  font-size:11.5px !important;
+  font-weight:700 !important;
+  letter-spacing:.06em !important;
+  border-radius:999px !important;
+  white-space:nowrap !important;
+  cursor:pointer !important;
+  border:none !important;
+  background:transparent !important;
+  color:rgba(255,255,255,.7) !important;
+  transition:color .15s ease, background .15s ease !important;
+}
+.site-header:not(.is-dark) .lang-btn{color:var(--ink-3) !important}
+
+/* Active state */
+.lang-btn.active{
+  background:var(--gold) !important;
+  color:var(--navy) !important;
+}
+.site-header:not(.is-dark) .lang-btn.active{
+  background:var(--navy) !important;
+  color:#fff !important;
+}
+
+/* Hover */
+.lang-btn:not(.active):hover{color:#fff !important}
+.site-header:not(.is-dark) .lang-btn:not(.active):hover{color:var(--navy) !important}
+
+@media (max-width:640px){
+  .lang-btn{min-width:34px !important;height:26px !important;padding:0 9px !important;font-size:11px !important}
+  .nav-right{gap:8px !important;flex-shrink:0 !important;display:flex !important;align-items:center !important}
+  .nav-wrap{gap:10px !important}
+}
+@media (max-width:380px){
+  .lang-btn{min-width:32px !important;padding:0 7px !important;font-size:10.5px !important}
+}
+
+
+/* ============================================
+   MOBILE SCROLL POLISH · v5
+   - Disable expensive transforms on mobile (smoothness)
+   - Section snap scroll on mobile (proximity)
+   - Disable zoom (viewport meta — already done)
+   ============================================ */
+
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;touch-action:pan-y}
+body{-webkit-overflow-scrolling:touch;overscroll-behavior-y:none}
+
+/* ===== Mobile smoothness — kill expensive effects ===== */
+@media (max-width:768px), (pointer:coarse){
+  /* No scroll-driven parallax on touch — was causing jank */
+  .aurora-orb,
+  .aurora-orb.o1, .aurora-orb.o2, .aurora-orb.o3, .aurora-orb.o4{
+    transform:none !important;
+    animation-duration:30s !important;
+    filter:blur(50px) !important;
+    will-change:auto !important;
+  }
+  .aurora-orb.o4{display:none !important}
+
+  /* Disable energy line slide animation (cheap but removes jank) */
+  .energy-line{animation:none !important}
+  .energy-line.l3{display:none !important}
+
+  /* Constellation simpler */
+  .constellation .c-dot{animation:cPulse 5s ease-in-out infinite !important}
+  .constellation .c-line{animation:none !important}
+
+  /* Film grain off (expensive blend-mode) */
+  body::before{display:none !important}
+
+  /* Cursor follow off (already disabled by COARSE in JS, but ensure) */
+  .cursor-follow{display:none !important}
+
+  /* Reduce hover transforms on touch (no hover state on touch) */
+  .pillar:hover, .case:hover, .tier:hover, .stage:hover, .ctype:hover, .diag:hover, .bmodel:hover, .value:hover, .influ-tile:hover, .blog-card:hover{
+    transform:none !important;
+  }
+
+  /* trust-grid streak animation off on mobile */
+  .trust-grid::before{animation:none !important;opacity:.5 !important}
+
+  /* Conic spin off */
+  .influ-card::after{animation:none !important}
+
+  /* Card hover gradient overlays off */
+  .pillar::after, .case::after, .bmodel::after, .ctype::after{display:none !important}
+}
+
+/* ===== Section snap on mobile — proximity (gentle, not jarring) ===== */
+@media (max-width:768px){
+  html{scroll-snap-type:y proximity}
+  .hero, .page-hero, .product-hero,
+  section.section, section.section-soft, section.section-navy,
+  .trust, .cta-band{
+    scroll-snap-align:start;
+    scroll-snap-stop:normal;
+  }
+  /* Long sections should not be snap-locked — let user read */
+  section.section.no-snap, .section-tight{
+    scroll-snap-align:none;
+  }
+}
+
+/* Smooth scroll-to-top button click */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .aurora-orb, .energy-line, .c-dot, .c-line{animation:none !important}
+}
+
+/* ===== Touch device — bigger tap targets ===== */
+@media (pointer:coarse){
+  .btn, .lang-btn, .nav-link, .menu-toggle{min-height:44px}
+  .btn{padding-top:14px;padding-bottom:14px}
+  .nav-link{padding-top:14px;padding-bottom:14px}
+}
+
+/* ===== Smooth hero video on mobile (avoid janky filter) ===== */
+@media (max-width:768px){
+  .hero-video-wrap video{filter:saturate(.8) contrast(1.02) brightness(.78);transform:none}
+}
+
+
+/* ============================================
+   CTA BAND READABILITY · v6
+   - Body text was too faint on dark navy
+   ============================================ */
+.cta-band p{
+  color:rgba(255,255,255,0.88) !important;
+  font-size:17.5px !important;
+  line-height:1.72 !important;
+  max-width:54ch;
+  margin-left:auto;margin-right:auto;
+  font-weight:400;
+}
+.cta-band h2{
+  color:#fff !important;
+  font-weight:700;
+  letter-spacing:-0.02em;
+  text-shadow:0 2px 16px rgba(0,0,0,.25);
+}
+.cta-band h2 em{
+  font-family:'Instrument Serif',serif;
+  font-style:italic;
+  color:var(--gold) !important;
+  font-weight:400;
+}
+.cta-band .eyebrow{
+  color:rgba(255,255,255,0.7) !important;
+}
+.cta-band .eyebrow.on-dark{color:var(--gold) !important}
+
+/* Mission tile additions */
+.mission-tile{min-height:540px;padding:32px 32px 36px;position:relative;display:flex;flex-direction:column;justify-content:space-between}
+.mission-marker{display:flex;align-items:baseline;gap:14px;position:relative;z-index:1}
+.mission-marker-num{
+  font-family:'Instrument Serif',serif;font-style:italic;
+  font-size:20px;color:var(--gold);letter-spacing:-0.015em;
+}
+.mission-marker-label{font-size:10.5px;letter-spacing:.32em;color:rgba(255,255,255,.55);font-weight:600;text-transform:uppercase}
+
+.mission-net{width:100%;height:auto;max-height:180px;margin:20px 0 12px;position:relative;z-index:1}
+
+.mission-kpi{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  padding:18px 0;
+  border-top:1px solid rgba(255,255,255,.10);
+  border-bottom:1px solid rgba(255,255,255,.10);
+  position:relative;z-index:1;
+}
+.mission-kpi-cell{text-align:center;padding:4px 6px}
+.mission-kpi-val{
+  font-family:'Instrument Serif',serif;font-style:italic;
+  font-size:24px;color:#fff;line-height:1;letter-spacing:-0.02em;
+  display:flex;align-items:baseline;justify-content:center;gap:1px;
+}
+.mission-kpi-val span{color:var(--gold);font-size:14px}
+.mission-kpi-lbl{font-size:10px;color:rgba(255,255,255,.55);margin-top:6px;letter-spacing:.06em}
+
+.art-tile-quote{font-size:22px;line-height:1.42;margin-top:24px;max-width:90%;position:relative;z-index:1}
+.art-tile-quote::before{font-size:54px;left:-18px;top:-10px}
+
+@media (max-width:640px){
+  .mission-tile{min-height:auto;padding:28px 22px}
+  .mission-net{max-height:140px}
+  .mission-kpi{grid-template-columns:repeat(2,1fr);gap:14px}
+  .mission-kpi-val{font-size:22px}
+  .art-tile-quote{font-size:18px;line-height:1.45}
+  .cta-band h2{font-size:22px !important;line-height:1.25}
+  .cta-band p{font-size:14.5px !important}
+}
