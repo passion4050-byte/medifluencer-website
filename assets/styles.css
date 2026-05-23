@@ -2089,3 +2089,108 @@ body{-webkit-overflow-scrolling:touch;overscroll-behavior-y:none}
   .cta-band .cta-row{flex-direction:column !important;width:100% !important}
   .cta-band .cta-row .btn{width:100%;justify-content:center}
 }
+
+
+/* ============================================
+   CTA BAND · GRID STACK FORCE · v10
+   - Some pages had cta-row floating beside the <p>
+   - Use grid to absolutely guarantee vertical stack
+   ============================================ */
+.cta-band{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  justify-items:center !important;
+  align-items:start !important;
+  row-gap:0;
+  text-align:center !important;
+  padding:64px 48px !important;
+}
+.cta-band > .aurora{grid-row:1;grid-column:1;width:100%;height:100%;justify-self:stretch}
+.cta-band > .eyebrow,
+.cta-band > h2,
+.cta-band > p,
+.cta-band > .cta-row{
+  grid-column:1 !important;
+  width:auto !important;
+  max-width:100% !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  display:block !important;
+}
+.cta-band > h2{margin-bottom:14px !important}
+.cta-band > p{margin-bottom:24px !important;max-width:54ch !important;display:block !important}
+.cta-band > .cta-row{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:wrap !important;
+  justify-content:center !important;
+  gap:12px !important;
+  width:fit-content !important;
+  margin-top:8px !important;
+}
+@media (max-width:640px){
+  .cta-band{padding:36px 24px !important}
+  .cta-band > .cta-row{flex-direction:column !important;width:100% !important}
+  .cta-band > .cta-row .btn{width:100%;justify-content:center}
+}
+
+/* Mission net SVG taller so labels have room */
+.mission-net{max-height:200px !important;width:100% !important;height:auto;margin:16px 0}
+@media (max-width:640px){.mission-net{max-height:160px !important}}
+
+
+/* ============================================
+   SECTION HEAD · GRID STACK FORCE · v11
+   - h2 + p must always be on separate rows
+   ============================================ */
+.section-head{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  justify-items:center !important;
+  text-align:center !important;
+  max-width:780px !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  margin-bottom:64px !important;
+  row-gap:14px;
+}
+.section-head > .eyebrow,
+.section-head > .eyebrow-mag,
+.section-head > h2,
+.section-head > p,
+.section-head > div{
+  grid-column:1 !important;
+  width:auto !important;
+  max-width:100% !important;
+}
+.section-head h2{
+  display:block !important;
+  width:auto !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  position:relative;
+  padding-bottom:14px;
+  max-width:24ch !important;
+}
+.section-head h2::after{
+  content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:0;height:1px;background:var(--gold);
+  transition:width 1s cubic-bezier(.2,.8,.2,1) .2s;
+}
+.section-head.in h2::after, .section-head[data-reveal].in h2::after{width:48px}
+.section-head p{
+  display:block !important;
+  margin-top:0 !important;
+  max-width:60ch !important;
+  font-size:16.5px;
+  line-height:1.72;
+  color:var(--ink-3);
+}
+
+/* Left-aligned variant */
+.section-head.left{justify-items:start !important;text-align:left !important;margin-left:0 !important}
+.section-head.left h2, .section-head.left p{margin-left:0 !important;margin-right:auto !important}
+.section-head.left h2::after{left:0;transform:none}
+
+/* Dark variant */
+.section-navy .section-head p, .product-hero .section-head p{color:rgba(255,255,255,.82)}
