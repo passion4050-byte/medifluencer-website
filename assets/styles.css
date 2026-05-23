@@ -1584,3 +1584,47 @@ body{top:0 !important;position:static !important}
 
 /* Prevent translate from touching our hand-crafted EN content */
 [data-lang="en"], .notranslate{}
+
+
+/* ============================================
+   LANG TOGGLE — guarantee both KR/EN visible
+   (Fix: EN button missing on mobile/small screens)
+   ============================================ */
+.lang-toggle{
+  display:inline-flex !important;
+  align-items:center;
+  gap:2px;
+  flex-shrink:0;
+  padding:3px;
+  border-radius:999px;
+}
+.lang-btn{
+  display:inline-flex !important;
+  align-items:center;
+  justify-content:center;
+  min-width:36px;
+  height:28px;
+  padding:0 10px;
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.06em;
+  border-radius:999px;
+  white-space:nowrap;
+  cursor:pointer;
+  flex-shrink:0;
+}
+@media (max-width:640px){
+  .lang-toggle{padding:2px;gap:2px}
+  .lang-btn{min-width:32px;height:26px;padding:0 8px;font-size:11px}
+  .nav-wrap{gap:8px !important}
+  .nav-right{gap:6px !important;flex-shrink:0}
+}
+@media (max-width:380px){
+  .lang-btn{min-width:30px;padding:0 7px;font-size:10.5px}
+}
+
+/* When the active button has gold background, the inactive must still be visible */
+.lang-btn:not(.active){color:rgba(255,255,255,0.6)}
+.site-header:not(.is-dark) .lang-btn:not(.active){color:var(--ink-3)}
+.lang-btn:not(.active):hover{color:#fff}
+.site-header:not(.is-dark) .lang-btn:not(.active):hover{color:var(--navy)}
