@@ -8,8 +8,19 @@
   // ------- Auth guard -------
   function guard() {
     if (!SB.sbAuth.isAuthenticated()) {
-      location.href = 'login.html';
+      // Avoid redirect loops if we're already on login
+      if (!/login(\.html)?$/.test(location.pathname)) {
+        location.replace('login.html');
+      }
       throw new Error('redirecting');
+    }
+    // Best-effort token refresh in the background (non-blocking)
+    const s = SB.sbAuth.getSession();
+    if (s && s.expires_at) {
+      const ttl = (s.expires_at * 1000) - Date.now();
+      if (ttl < 5 * 60 * 1000) { // <5min left
+        SB.sbAuth.refresh().catch(() => {});
+      }
     }
   }
   function userEmail() {
@@ -111,15 +122,18 @@
 
   function attachShell(activeKey) {
     guard();
-    // mobile topbar at very top
+    const shell = document.querySelector('.admin-shell');
+
+    // mobile topbar + backdrop at very top of body (outside the grid)
     const topbarWrap = document.createElement('div');
     topbarWrap.innerHTML = buildTopbar();
     while (topbarWrap.firstChild) document.body.insertBefore(topbarWrap.firstChild, document.body.firstElementChild);
 
-    // sidebar after topbar+backdrop
+    // sidebar MUST be inside .admin-shell (grid container) as the first child
+    // so the grid layout (260px sidebar + 1fr main) actually works.
     const sideWrap = document.createElement('div');
     sideWrap.innerHTML = buildSidebar(activeKey);
-    document.body.insertBefore(sideWrap.firstElementChild, document.querySelector('.admin-shell'));
+    shell.insertBefore(sideWrap.firstElementChild, shell.firstElementChild);
 
     // Sign out
     document.getElementById('signoutBtn').addEventListener('click', async () => {
