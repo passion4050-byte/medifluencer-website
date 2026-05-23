@@ -218,8 +218,9 @@ function mdToHtml(md) {
   if (!slug) { loading.style.display='none'; notFound.style.display='block'; return; }
 
   try {
+    const nowIso = new Date().toISOString();
     const res = await SB.sbSelect('blog_posts',
-      `?select=*&slug=eq.${encodeURIComponent(slug)}&status=eq.published&limit=1`);
+      `?select=*&slug=eq.${encodeURIComponent(slug)}&status=eq.published&published_at=lte.${nowIso}&limit=1`);
     if (!res || !res.length) { loading.style.display='none'; notFound.style.display='block'; return; }
     const p = res[0];
     const lang = document.documentElement.lang || 'ko';

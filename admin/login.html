@@ -4,33 +4,30 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Admin · Login</title>
-<link rel="stylesheet" href="../assets/styles.css">
+<link rel="stylesheet" href="admin.css">
 <style>
-body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--bg-navy) 0%,var(--bg-navy-deep) 100%);position:relative;overflow:hidden}
-body::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 20%, rgba(184,149,103,.12) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(31,95,168,.18) 0%, transparent 50%);pointer-events:none}
-.login-card{background:rgba(255,255,255,.04);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:48px 40px;width:100%;max-width:420px;color:#fff;position:relative;z-index:1;box-shadow:0 32px 80px -16px rgba(0,0,0,.4)}
+.login-card{background:rgba(255,255,255,.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:48px 40px;width:100%;max-width:420px;color:#fff;position:relative;z-index:1;box-shadow:0 32px 80px -16px rgba(0,0,0,.4)}
 .login-mark{display:flex;align-items:center;gap:10px;margin-bottom:32px;font-size:16px}
-.login-mark .brand-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--navy) 0%,#1a3a62 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.login-mark .brand-mark::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent 50%,rgba(184,149,103,.45) 100%)}
+.login-mark .brand-mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#143256 0%,#1a3a62 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border:1px solid rgba(184,149,103,.35)}
 .login-mark svg{width:18px;height:18px;position:relative;z-index:1}
 .login-mark-text{display:flex;flex-direction:column;line-height:1.1}
 .login-mark-text strong{font-weight:700;font-size:15px}
-.login-mark-text small{font-size:10px;letter-spacing:.16em;color:rgba(255,255,255,.55);text-transform:uppercase}
-.login-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:38px;color:#fff;letter-spacing:-0.02em;line-height:1.05;margin-bottom:10px}
+.login-mark-text small{font-size:10px;letter-spacing:.18em;color:#B89567;text-transform:uppercase;margin-top:3px;font-weight:500}
+.login-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:40px;color:#fff;letter-spacing:-0.02em;line-height:1.05;margin-bottom:10px}
 .login-sub{font-size:13.5px;color:rgba(255,255,255,.62);margin-bottom:32px;line-height:1.6}
 .login-field{margin-bottom:18px}
-.login-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:8px}
-.login-field input{width:100%;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:8px;color:#fff;font-size:15px;transition:border-color .2s ease, box-shadow .2s ease}
-.login-field input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(184,149,103,.15)}
-.login-btn{width:100%;padding:14px 20px;border-radius:8px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-deep) 100%);color:var(--navy);font-weight:700;font-size:14.5px;letter-spacing:.02em;border:none;cursor:pointer;margin-top:8px;transition:transform .2s ease, box-shadow .25s ease;box-shadow:0 8px 24px -8px rgba(184,149,103,.5)}
+.login-field label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:8px}
+.login-field input{width:100%;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:8px;color:#fff;font-size:15px;transition:border-color .2s ease,box-shadow .2s ease;font-family:inherit}
+.login-field input:focus{outline:none;border-color:#B89567;box-shadow:0 0 0 4px rgba(184,149,103,.15)}
+.login-btn{width:100%;padding:14px 20px;border-radius:8px;background:linear-gradient(135deg,#B89567 0%,#8E6E45 100%);color:#fff;font-weight:700;font-size:14.5px;letter-spacing:.02em;border:none;cursor:pointer;margin-top:8px;transition:transform .2s ease,box-shadow .25s ease;box-shadow:0 8px 24px -8px rgba(184,149,103,.5);text-shadow:0 1px 0 rgba(0,0,0,.12);font-family:inherit}
 .login-btn:hover{transform:translateY(-1px);box-shadow:0 14px 32px -8px rgba(184,149,103,.65)}
-.login-btn:disabled{opacity:.6;cursor:not-allowed}
+.login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
 .login-err{margin-top:14px;padding:12px 14px;background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.3);border-radius:6px;font-size:13px;color:#fca5a5;display:none}
 .login-link{display:block;margin-top:28px;font-size:12.5px;text-align:center;color:rgba(255,255,255,.5)}
-.login-link a{color:var(--gold);border-bottom:1px solid rgba(184,149,103,.4)}
+.login-link a{color:#B89567;border-bottom:1px solid rgba(184,149,103,.4)}
 </style>
 </head>
-<body>
+<body class="login-page">
 <div class="login-card">
   <div class="login-mark">
     <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M5 5h2.6l3.4 8 3.4-8H17v14h-2.1V9.3L11.6 19h-1.2L7.1 9.3V19H5z" fill="#B89567"/></svg></span>
@@ -38,17 +35,17 @@ body::after{content:"";position:absolute;inset:0;background:radial-gradient(circ
   </div>
   <h1 class="login-title">Welcome back.</h1>
   <p class="login-sub">관리자 계정으로 로그인하세요. 첫 로그인 후에는 비밀번호를 즉시 변경하시는 것을 권장합니다.</p>
-  <form id="loginForm">
+  <form id="loginForm" autocomplete="on">
     <div class="login-field">
       <label>Email</label>
-      <input type="email" name="email" id="email" required autocomplete="email" placeholder="passion4050@gmail.com">
+      <input type="email" name="email" id="email" required autocomplete="username" placeholder="passion4050@gmail.com">
     </div>
     <div class="login-field">
       <label>Password</label>
-      <input type="password" name="password" id="password" required autocomplete="current-password">
+      <input type="password" name="password" id="password" required autocomplete="current-password" minlength="6">
     </div>
     <button type="submit" class="login-btn" id="submitBtn">로그인</button>
-    <div class="login-err" id="loginErr"></div>
+    <div class="login-err" id="loginErr" role="alert" aria-live="polite"></div>
   </form>
   <a class="login-link" href="../index.html">← 메인 사이트로</a>
 </div>
@@ -60,7 +57,7 @@ const btn = document.getElementById('submitBtn');
 const err = document.getElementById('loginErr');
 
 // Auto-redirect if already signed in
-if (SB.sbAuth.isAuthenticated()) location.href = 'index.html';
+if (SB.sbAuth.isAuthenticated()) location.replace('inbox.html');
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -70,7 +67,7 @@ form.addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value;
   try {
     await SB.sbAuth.signInWithPassword({ email, password });
-    location.href = 'index.html';
+    location.replace('inbox.html');
   } catch (e) {
     err.textContent = '로그인 실패 — 이메일 또는 비밀번호를 확인해주세요.';
     err.style.display = 'block';

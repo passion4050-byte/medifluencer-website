@@ -12,12 +12,21 @@
     <header class="admin-head">
       <div>
         <h1 id="pgTitle">새 글 작성</h1>
-        <p><a class="btn-link" href="posts.html">← Posts 목록으로</a></p>
+        <p>
+          <a class="btn-link" href="posts.html">← Posts 목록으로</a>
+          <span class="autosave" id="autosaveInd" style="margin-left:14px"><span class="dot"></span><span class="label">아직 저장 안 됨</span></span>
+        </p>
       </div>
       <div class="actions">
-        <button class="btn-sec" id="previewBtn">미리보기</button>
+        <button class="btn-sec" id="previewBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          미리보기
+        </button>
         <button class="btn-sec" id="draftBtn">초안 저장</button>
-        <button class="btn-pri" id="publishBtn">발행</button>
+        <button class="btn-pri" id="publishBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          발행
+        </button>
       </div>
     </header>
 
@@ -25,12 +34,13 @@
       <section class="editor-main">
         <div class="editor-field">
           <label>슬러그 (URL)</label>
-          <input type="text" id="f-slug" placeholder="my-first-post (영문 소문자 + 하이픈)">
+          <input type="text" id="f-slug" placeholder="my-first-post (영문 소문자 + 숫자 + 하이픈만)">
+          <div class="helper">최종 URL: <code id="slugPreview">/blog-post.html?slug=…</code></div>
         </div>
 
         <div class="editor-row">
           <div class="editor-field">
-            <label>제목 (한국어)</label>
+            <label>제목 (한국어) <span style="color:#dc2626">*</span></label>
             <input type="text" id="f-title-ko">
           </div>
           <div class="editor-field">
@@ -41,8 +51,8 @@
 
         <div class="editor-row">
           <div class="editor-field">
-            <label>요약 (한국어)</label>
-            <textarea id="f-excerpt-ko" style="min-height:80px"></textarea>
+            <label>요약 (한국어) · SEO 메타 디스크립션</label>
+            <textarea id="f-excerpt-ko" style="min-height:80px" placeholder="검색 결과에 표시될 한 줄 요약 (120~160자 권장)"></textarea>
           </div>
           <div class="editor-field">
             <label>요약 (영문)</label>
@@ -52,7 +62,7 @@
 
         <div class="editor-field">
           <label>본문 (한국어) · Markdown</label>
-          <textarea id="f-body-ko" class="body" placeholder="## 헤딩&#10;본문 내용...&#10;&#10;- 리스트&#10;- 항목&#10;&#10;**굵게** *기울임*"></textarea>
+          <textarea id="f-body-ko" class="body" placeholder="## 헤딩&#10;본문 내용...&#10;&#10;- 리스트&#10;- 항목&#10;&#10;**굵게** *기울임*&#10;&#10;[링크 텍스트](contact.html)"></textarea>
         </div>
 
         <div class="editor-field">
@@ -85,13 +95,22 @@
         </div>
 
         <div class="editor-field">
-          <label>커버 이미지 URL</label>
-          <input type="url" id="f-cover" placeholder="https://...">
+          <label>커버 이미지</label>
+          <div class="upload-field">
+            <div class="upload-preview empty" id="coverPreview"></div>
+            <input type="file" id="coverFile" accept="image/*" style="display:none">
+            <label class="upload-btn" for="coverFile">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <span id="uploadLabel">이미지 업로드</span>
+            </label>
+            <input type="url" id="f-cover" placeholder="또는 이미지 URL 직접 입력" style="margin-top:6px">
+          </div>
         </div>
 
         <div class="editor-field">
-          <label>발행일 (선택)</label>
+          <label>발행일 (예약 가능)</label>
           <input type="datetime-local" id="f-publishedAt">
+          <div class="helper">미래 날짜를 입력하면 예약 발행됩니다.</div>
         </div>
 
         <button class="btn-pri" id="saveBtn">저장</button>
@@ -113,24 +132,90 @@ MFAdmin.attachShell('posts');
 const id = new URLSearchParams(location.search).get('id');
 const F = id => document.getElementById(id);
 const isNew = !id;
+const AUTOSAVE_KEY = `mf_post_draft_${id || 'new'}`;
 
+// English-only slugify (Korean → drop, Hangul→none)
 function slugify(s) {
-  return (s || '').toLowerCase()
-    .replace(/[^a-z0-9가-힣\s-]/g, '')
+  return (s || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')       // drop everything except a-z, 0-9, space, hyphen
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 80);
 }
 
-F('f-title-ko').addEventListener('blur', () => {
-  if (!F('f-slug').value) F('f-slug').value = slugify(F('f-title-ko').value);
+function updateSlugPreview() {
+  const slug = F('f-slug').value.trim();
+  document.getElementById('slugPreview').textContent = slug ? `/blog-post.html?slug=${slug}` : '/blog-post.html?slug=…';
+}
+
+// Slug input — enforce charset on every keystroke
+F('f-slug').addEventListener('input', () => {
+  const cleaned = F('f-slug').value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+  if (cleaned !== F('f-slug').value) F('f-slug').value = cleaned;
+  updateSlugPreview();
 });
 
+// Auto-suggest slug from English title on blur
+F('f-title-en').addEventListener('blur', () => {
+  if (!F('f-slug').value && F('f-title-en').value) {
+    F('f-slug').value = slugify(F('f-title-en').value);
+    updateSlugPreview();
+  }
+});
+F('f-title-ko').addEventListener('blur', () => {
+  // If still empty AND no English title, prompt with a placeholder
+  if (!F('f-slug').value && !F('f-title-en').value) {
+    F('f-slug').focus();
+  }
+});
+
+// Cover image preview from URL
+function setCoverPreview(url) {
+  const p = document.getElementById('coverPreview');
+  if (url) { p.style.backgroundImage = `url(${url})`; p.classList.remove('empty'); }
+  else { p.style.backgroundImage = ''; p.classList.add('empty'); }
+}
+F('f-cover').addEventListener('input', () => setCoverPreview(F('f-cover').value.trim()));
+
+// Cover image upload
+document.getElementById('coverFile').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const label = document.getElementById('uploadLabel');
+  const orig = label.textContent;
+  label.textContent = '업로드 중…';
+  try {
+    const { publicUrl } = await MFAdmin.uploadImage(file, { prefix: 'cover' });
+    F('f-cover').value = publicUrl;
+    setCoverPreview(publicUrl);
+    MFAdmin.toast('이미지 업로드 완료');
+  } catch (err) {
+    MFAdmin.toast('업로드 실패: ' + err.message, {error:true});
+  } finally {
+    label.textContent = orig;
+    e.target.value = ''; // reset
+  }
+});
+
+// Existing post load
 if (!isNew) {
   document.getElementById('pgTitle').textContent = '글 편집';
   document.getElementById('deleteBtn').style.display = 'block';
   loadPost();
+} else {
+  // Try restore from autosave on new post
+  const restored = autosaver.load();
+  if (restored && restored.v) {
+    if (confirm('이전에 작성하던 초안이 있습니다. 불러올까요?')) {
+      Object.entries(restored.v).forEach(([k,v]) => { if (F(k) && v != null) F(k).value = v; });
+      setCoverPreview(F('f-cover').value);
+      updateSlugPreview();
+    } else {
+      autosaver.clear();
+    }
+  }
 }
 
 async function loadPost() {
@@ -148,18 +233,37 @@ async function loadPost() {
     F('f-status').value = p.status || 'draft';
     F('f-tag').value = p.tag || 'medical';
     F('f-cover').value = p.cover_url || '';
+    setCoverPreview(p.cover_url);
+    updateSlugPreview();
     if (p.published_at) {
       const d = new Date(p.published_at);
       const local = new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,16);
       F('f-publishedAt').value = local;
     }
+    const isScheduled = p.status === 'published' && p.published_at && new Date(p.published_at) > new Date();
     document.getElementById('metaInfo').innerHTML = `
       작성일: ${MFAdmin.fmtDate(p.created_at)}<br>
       수정일: ${MFAdmin.fmtDate(p.updated_at)}<br>
       ${p.published_at ? '발행일: ' + MFAdmin.fmtDate(p.published_at) : ''}
+      ${isScheduled ? '<br><span style="color:#1E40AF;font-weight:600">⏱ 예약 발행 대기 중</span>' : ''}
     `;
-  } catch (e) { alert('불러오기 실패: ' + e.message); }
+  } catch (e) { MFAdmin.toast('불러오기 실패: ' + e.message, {error:true}); }
 }
+
+// Autosave hookup
+const fields = ['f-slug','f-title-ko','f-title-en','f-excerpt-ko','f-excerpt-en','f-body-ko','f-body-en','f-status','f-tag','f-cover','f-publishedAt'];
+const autosaver = MFAdmin.autosave(AUTOSAVE_KEY, () => {
+  const obj = {};
+  fields.forEach(k => obj[k] = F(k).value);
+  return obj;
+}, { interval: 1500, indicator: document.getElementById('autosaveInd') });
+
+fields.forEach(k => {
+  const el = F(k);
+  if (!el) return;
+  el.addEventListener('input', () => autosaver.schedule());
+  el.addEventListener('change', () => autosaver.schedule());
+});
 
 function collectPatch() {
   const status = F('f-status').value;
@@ -171,8 +275,10 @@ function collectPatch() {
   } else {
     pubAt = null;
   }
+  let slug = F('f-slug').value.trim();
+  if (!slug) slug = slugify(F('f-title-en').value || F('f-title-ko').value);
   return {
-    slug: F('f-slug').value.trim() || slugify(F('f-title-ko').value),
+    slug,
     title_ko: F('f-title-ko').value.trim(),
     title_en: F('f-title-en').value.trim() || null,
     excerpt_ko: F('f-excerpt-ko').value.trim() || null,
@@ -187,38 +293,64 @@ function collectPatch() {
   };
 }
 
-async function save(status) {
-  if (!F('f-title-ko').value.trim()) { alert('제목(한국어)을 입력해주세요'); return; }
+async function save(targetStatus) {
+  if (!F('f-title-ko').value.trim()) { MFAdmin.toast('제목(한국어)을 입력해주세요', {error:true}); F('f-title-ko').focus(); return; }
   const data = collectPatch();
-  if (status) data.status = status;
+  if (targetStatus) data.status = targetStatus;
+  if (!data.slug) { MFAdmin.toast('슬러그가 비어있습니다', {error:true}); F('f-slug').focus(); return; }
+
+  const btns = ['saveBtn','draftBtn','publishBtn'].map(F);
+  btns.forEach(b => b.disabled = true);
+
   try {
     if (isNew) {
       const res = await SB.sbInsert('blog_posts', data);
+      autosaver.clear();
       MFAdmin.toast('저장됨');
       location.href = `post-edit.html?id=${res[0].id}`;
     } else {
       await SB.sbUpdate('blog_posts', `id=eq.${id}`, data);
+      autosaver.clear();
       MFAdmin.toast('저장됨');
-      if (status) loadPost();
+      if (targetStatus) loadPost();
     }
   } catch (e) {
-    alert('저장 실패: ' + e.message);
+    MFAdmin.toast('저장 실패: ' + e.message, {error:true});
+  } finally {
+    btns.forEach(b => b.disabled = false);
   }
 }
 
-document.getElementById('saveBtn').onclick   = () => save(null);
-document.getElementById('draftBtn').onclick  = () => { F('f-status').value = 'draft'; save('draft'); };
+document.getElementById('saveBtn').onclick    = () => save(null);
+document.getElementById('draftBtn').onclick   = () => { F('f-status').value = 'draft'; save('draft'); };
 document.getElementById('publishBtn').onclick = () => { F('f-status').value = 'published'; save('published'); };
 document.getElementById('previewBtn').onclick = () => {
   const slug = F('f-slug').value.trim();
-  if (!slug) { alert('미리보기 전에 슬러그가 필요합니다'); return; }
-  window.open(`../blog-post.html?slug=${encodeURIComponent(slug)}`, '_blank');
+  if (!slug) { MFAdmin.toast('미리보기 전에 슬러그가 필요합니다', {error:true}); return; }
+  window.open(`../blog-post.html?slug=${encodeURIComponent(slug)}`, '_blank', 'noopener');
 };
 document.getElementById('deleteBtn').onclick = async () => {
   if (!confirm('이 글을 삭제하시겠습니까? 복구할 수 없습니다.')) return;
-  try { await SB.sbDelete('blog_posts', `id=eq.${id}`); MFAdmin.toast('삭제됨'); setTimeout(()=>location.href='posts.html', 600); }
-  catch (e) { alert('삭제 실패: ' + e.message); }
+  try {
+    await SB.sbDelete('blog_posts', `id=eq.${id}`);
+    autosaver.clear();
+    MFAdmin.toast('삭제됨');
+    setTimeout(()=>location.href='posts.html', 600);
+  } catch (e) { MFAdmin.toast('삭제 실패: ' + e.message, {error:true}); }
 };
+
+// Warn before leaving if dirty
+window.addEventListener('beforeunload', (e) => {
+  if (autosaver.isDirty()) { e.preventDefault(); e.returnValue = ''; }
+});
+
+// Ctrl/Cmd + S → save
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    save(null);
+  }
+});
 </script>
 </body>
 </html>

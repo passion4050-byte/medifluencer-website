@@ -15,7 +15,10 @@
         <p>블로그 / 소식 글을 발행하고 관리합니다.</p>
       </div>
       <div class="actions">
-        <button class="btn-sec" id="refreshBtn">↻ Refresh</button>
+        <button class="btn-sec" id="refreshBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          새로고침
+        </button>
         <a href="post-edit.html" class="btn-pri">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
           새 글 작성
@@ -24,24 +27,36 @@
     </header>
 
     <div class="stat-grid">
-      <div class="stat-card"><div class="stat-label">전체</div><div class="stat-val" id="stTotal">0</div></div>
-      <div class="stat-card"><div class="stat-label">Published</div><div class="stat-val" id="stPublished">0</div></div>
+      <div class="stat-card stat-card-accent"><div class="stat-label">전체</div><div class="stat-val" id="stTotal">0</div></div>
+      <div class="stat-card"><div class="stat-label">Published</div><div class="stat-val" id="stPublished">0</div><div class="stat-sub">발행 완료</div></div>
       <div class="stat-card"><div class="stat-label">Drafts</div><div class="stat-val" id="stDrafts">0</div><div class="stat-sub">발행 대기 중</div></div>
-      <div class="stat-card"><div class="stat-label">Archived</div><div class="stat-val" id="stArchived">0</div></div>
+      <div class="stat-card"><div class="stat-label">Scheduled</div><div class="stat-val" id="stScheduled">0</div><div class="stat-sub">예약 발행</div></div>
+      <div class="stat-card"><div class="stat-label">Archived</div><div class="stat-val" id="stArchived">0</div><div class="stat-sub">보관됨</div></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>
+        <input type="text" id="searchInput" placeholder="제목·슬러그·요약 검색…">
+      </div>
+      <div class="toolbar-filter" id="statusFilter">
+        <button class="chip active" data-status="">전체</button>
+        <button class="chip" data-status="published">Published</button>
+        <button class="chip" data-status="draft">Drafts</button>
+        <button class="chip" data-status="archived">Archived</button>
+      </div>
     </div>
 
     <div class="table-wrap">
       <table>
         <thead><tr>
           <th style="width:40%">제목</th>
-          <th style="width:14%">태그</th>
+          <th style="width:12%">태그</th>
           <th style="width:14%">상태</th>
-          <th style="width:16%">발행일</th>
+          <th style="width:18%">발행일</th>
           <th style="width:16%">관리</th>
         </tr></thead>
-        <tbody id="postRows">
-          <tr><td colspan="5" class="empty">불러오는 중…</td></tr>
-        </tbody>
+        <tbody id="postRows"></tbody>
       </table>
     </div>
   </main>
@@ -53,46 +68,105 @@
 MFAdmin.attachShell('posts');
 
 const tbody = document.getElementById('postRows');
+const searchInput = document.getElementById('searchInput');
+const statusFilter = document.getElementById('statusFilter');
+
+let allRows = [];
+let activeStatus = '';
+let activeQuery = '';
+
+function showSkeleton(){ tbody.innerHTML = MFAdmin.skeletonRows(5, 5); }
 
 async function load() {
-  tbody.innerHTML = '<tr><td colspan="5" class="empty">불러오는 중…</td></tr>';
+  showSkeleton();
   try {
-    const rows = await SB.sbSelect('blog_posts', '?select=*&order=created_at.desc&limit=200');
-    render(rows);
-    updateStats(rows);
+    const rows = await SB.sbSelect('blog_posts', '?select=*&order=created_at.desc&limit=500');
+    allRows = rows || [];
+    updateStats();
+    render();
   } catch (e) {
     console.error(e);
-    tbody.innerHTML = `<tr><td colspan="5" class="empty">불러오기 실패: ${MFAdmin.escape(e.message)}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="empty"><strong>불러오기 실패</strong>${MFAdmin.escape(e.message)}</td></tr>`;
   }
 }
 
-function updateStats(rows) {
-  document.getElementById('stTotal').textContent = rows.length;
-  document.getElementById('stPublished').textContent = rows.filter(r => r.status === 'published').length;
-  document.getElementById('stDrafts').textContent = rows.filter(r => r.status === 'draft').length;
-  document.getElementById('stArchived').textContent = rows.filter(r => r.status === 'archived').length;
+function updateStats() {
+  const now = new Date();
+  let published = 0, scheduled = 0, drafts = 0, archived = 0;
+  allRows.forEach(r => {
+    if (r.status === 'archived') { archived++; return; }
+    if (r.status === 'draft') { drafts++; return; }
+    if (r.status === 'published') {
+      if (r.published_at && new Date(r.published_at) > now) scheduled++;
+      else published++;
+    }
+  });
+  document.getElementById('stTotal').textContent = allRows.length;
+  document.getElementById('stPublished').textContent = published;
+  document.getElementById('stDrafts').textContent = drafts;
+  document.getElementById('stScheduled').textContent = scheduled;
+  document.getElementById('stArchived').textContent = archived;
 }
 
-function render(rows) {
-  if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty">아직 글이 없습니다. <a class="btn-link" href="post-edit.html">첫 글을 작성하세요 →</a></td></tr>';
+function render() {
+  const filtered = MFAdmin.filterRows(allRows, {
+    search: activeQuery,
+    fields: ['title_ko','title_en','slug','excerpt_ko'],
+    status: activeStatus || null,
+  });
+
+  if (!filtered.length) {
+    tbody.innerHTML = allRows.length === 0
+      ? `<tr><td colspan="5" class="empty"><strong>아직 글이 없습니다</strong><a class="btn-link" href="post-edit.html">첫 글을 작성하세요 →</a></td></tr>`
+      : `<tr><td colspan="5" class="empty"><strong>조건에 맞는 글이 없습니다</strong>검색어나 필터를 조정해보세요.</td></tr>`;
     return;
   }
-  tbody.innerHTML = rows.map(r => `
+
+  const now = new Date();
+  tbody.innerHTML = filtered.map(r => {
+    const isScheduled = r.status === 'published' && r.published_at && new Date(r.published_at) > now;
+    const statusDisplay = isScheduled ? '<span class="cell-status reviewing" title="예약 발행">scheduled</span>' : `<span class="cell-status ${r.status}">${r.status}</span>`;
+    return `
     <tr data-id="${r.id}">
       <td>
         <div class="cell-name">${MFAdmin.escape(r.title_ko)}</div>
         <div class="cell-meta">/${MFAdmin.escape(r.slug)}</div>
       </td>
-      <td><span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8E6E45;background:#EFE5D2;padding:3px 9px;border-radius:3px">${MFAdmin.escape(r.tag || 'medical')}</span></td>
-      <td><span class="cell-status ${r.status}">${r.status}</span></td>
-      <td style="font-size:12.5px;color:#64748B">${r.published_at ? MFAdmin.fmtDateShort(r.published_at) : '—'}</td>
+      <td><span class="cell-tag">${MFAdmin.escape(r.tag || 'medical')}</span></td>
+      <td>${statusDisplay}</td>
+      <td style="font-size:12.5px;color:#64748B" title="${r.published_at ? MFAdmin.fmtDate(r.published_at) : '—'}">${r.published_at ? MFAdmin.fmtDateShort(r.published_at) : '—'}</td>
       <td>
         <a class="btn-link" href="post-edit.html?id=${r.id}">편집</a>
-        ${r.status === 'published' ? `<a class="btn-link" target="_blank" href="../blog-post.html?slug=${encodeURIComponent(r.slug)}" style="margin-left:10px">미리보기 ↗</a>` : ''}
+        ${r.status === 'published' && !isScheduled ? `<a class="btn-link" target="_blank" rel="noopener" href="../blog-post.html?slug=${encodeURIComponent(r.slug)}" style="margin-left:10px">미리보기 ↗</a>` : ''}
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
+
+  // Row click → edit
+  tbody.querySelectorAll('tr[data-id]').forEach(tr => {
+    tr.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') return;
+      location.href = `post-edit.html?id=${tr.dataset.id}`;
+    });
+  });
 }
+
+// Search (debounced)
+let searchTimer = null;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => { activeQuery = searchInput.value; render(); }, 150);
+});
+
+// Filter chips
+statusFilter.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  statusFilter.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  activeStatus = chip.dataset.status;
+  render();
+});
 
 document.getElementById('refreshBtn').onclick = load;
 load();

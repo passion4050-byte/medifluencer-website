@@ -230,7 +230,8 @@
   let currentFilter = 'all';
 
   try {
-    posts = await SB.sbSelect('blog_posts','?select=slug,title_ko,title_en,excerpt_ko,excerpt_en,cover_url,tag,published_at,body_ko,body_en,status&status=eq.published&order=published_at.desc');
+    const nowIso = new Date().toISOString();
+    posts = await SB.sbSelect('blog_posts',`?select=slug,title_ko,title_en,excerpt_ko,excerpt_en,cover_url,tag,published_at,body_ko,body_en,status&status=eq.published&published_at=lte.${nowIso}&order=published_at.desc`);
     loading.style.display = 'none';
     if (!posts.length) { empty.style.display = 'block'; return; }
     renderFilters();

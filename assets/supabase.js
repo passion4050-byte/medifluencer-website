@@ -130,5 +130,5 @@
     }
   };
 
-  global.SB = { sbInsert, sbSelect, sbUpdate, sbDelete, sbAuth, SUPABASE_URL };
+  global.SB = { sbInsert, sbSelect, sbUpdate, sbDelete, sbAuth, SUPABASE_URL, ANON_KEY };
 })(window);

@@ -12,17 +12,18 @@
     <header class="admin-head">
       <div>
         <h1>Settings</h1>
-        <p>계정 설정과 비밀번호 변경.</p>
+        <p>계정 설정과 시스템 정보.</p>
       </div>
     </header>
 
-    <div class="editor" style="grid-template-columns:1fr">
-      <section class="editor-main" style="max-width:560px">
-        <h2 style="font-family:'Instrument Serif',serif;font-style:italic;font-size:22px;color:#0A2540;margin-bottom:22px;letter-spacing:-0.01em">비밀번호 변경</h2>
+    <div class="editor" style="grid-template-columns:1fr 320px">
+      <section class="editor-main" style="max-width:640px">
+        <h2 style="font-family:'Instrument Serif',serif;font-style:italic;font-size:24px;color:var(--a-navy);margin-bottom:22px;letter-spacing:-0.01em">비밀번호 변경</h2>
 
         <div class="editor-field">
           <label>새 비밀번호</label>
-          <input type="password" id="newPw" autocomplete="new-password">
+          <input type="password" id="newPw" autocomplete="new-password" minlength="8">
+          <div class="helper">최소 8자 이상, 영문 + 숫자 + 특수문자 조합 권장</div>
         </div>
         <div class="editor-field">
           <label>새 비밀번호 확인</label>
@@ -31,11 +32,40 @@
 
         <button class="btn-pri" id="changeBtn">비밀번호 변경</button>
 
-        <div style="margin-top:32px;padding-top:24px;border-top:1px solid #E2E8F0">
-          <h6 style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#475569;margin-bottom:10px;font-weight:600">계정 정보</h6>
-          <p style="font-size:13.5px;color:#475569" id="acctInfo">—</p>
+        <div style="margin-top:36px;padding-top:24px;border-top:1px solid var(--a-line)">
+          <h6 style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--a-mute);margin-bottom:14px;font-weight:600">계정 정보</h6>
+          <div style="font-size:13.5px;color:var(--a-ink-2);line-height:1.8" id="acctInfo">—</div>
         </div>
       </section>
+
+      <aside class="editor-aside">
+        <h6>시스템</h6>
+        <div style="font-size:12.5px;color:var(--a-ink-3);line-height:1.7">
+          <div style="margin-bottom:10px">
+            <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--a-mute);margin-bottom:3px">현재 세션</div>
+            <div id="sessionInfo" style="color:var(--a-ink)">—</div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--a-mute);margin-bottom:3px">DB 연결</div>
+            <div id="dbInfo" style="color:var(--a-ink)">—</div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--a-mute);margin-bottom:3px">버전</div>
+            <div style="color:var(--a-ink)">Admin v2 · 2026-05-23</div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--a-line)">
+          <a href="../sitemap.xml" target="_blank" rel="noopener" class="btn-sec" style="width:100%;justify-content:center;margin-bottom:8px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+            sitemap.xml 보기
+          </a>
+          <a href="../robots.txt" target="_blank" rel="noopener" class="btn-sec" style="width:100%;justify-content:center">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+            robots.txt 보기
+          </a>
+        </div>
+      </aside>
     </div>
   </main>
 </div>
@@ -45,20 +75,38 @@
 <script>
 MFAdmin.attachShell('settings');
 
-document.getElementById('acctInfo').textContent = 'Email: ' + MFAdmin.userEmail();
+// Account info
+const session = SB.sbAuth.getSession();
+const user = session && session.user;
+document.getElementById('acctInfo').innerHTML = `
+  <div><strong style="color:var(--a-navy)">Email:</strong> ${MFAdmin.escape(user?.email || '—')}</div>
+  ${user?.created_at ? `<div><strong style="color:var(--a-navy)">가입일:</strong> ${MFAdmin.fmtDate(user.created_at)}</div>` : ''}
+  ${user?.last_sign_in_at ? `<div><strong style="color:var(--a-navy)">마지막 로그인:</strong> ${MFAdmin.fmtDate(user.last_sign_in_at)}</div>` : ''}
+`;
+
+// Session info
+if (session && session.expires_at) {
+  const expDate = new Date(session.expires_at * 1000);
+  document.getElementById('sessionInfo').textContent = `만료 ${MFAdmin.fmtRelative(expDate.toISOString())}`;
+}
+document.getElementById('dbInfo').innerHTML = `<span style="color:var(--a-success)">● 연결됨</span>`;
 
 document.getElementById('changeBtn').onclick = async () => {
   const pw = document.getElementById('newPw').value;
   const pw2 = document.getElementById('newPw2').value;
-  if (!pw || pw.length < 8) { alert('비밀번호는 최소 8자 이상이어야 합니다'); return; }
-  if (pw !== pw2) { alert('비밀번호가 일치하지 않습니다'); return; }
+  if (!pw || pw.length < 8) { MFAdmin.toast('비밀번호는 최소 8자 이상이어야 합니다', {error:true}); return; }
+  if (pw !== pw2) { MFAdmin.toast('비밀번호가 일치하지 않습니다', {error:true}); return; }
+  const btn = document.getElementById('changeBtn');
+  btn.disabled = true; btn.textContent = '변경 중…';
   try {
     await SB.sbAuth.updateUser({ password: pw });
     MFAdmin.toast('비밀번호가 변경되었습니다');
     document.getElementById('newPw').value = '';
     document.getElementById('newPw2').value = '';
   } catch (e) {
-    alert('변경 실패: ' + e.message);
+    MFAdmin.toast('변경 실패: ' + e.message, {error:true});
+  } finally {
+    btn.disabled = false; btn.textContent = '비밀번호 변경';
   }
 };
 </script>
