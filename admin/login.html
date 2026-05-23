@@ -57,7 +57,7 @@ const btn = document.getElementById('submitBtn');
 const err = document.getElementById('loginErr');
 
 // Auto-redirect if already signed in (absolute path to avoid cleanUrls trap)
-if (SB.sbAuth.isAuthenticated()) location.replace('/admin/inbox.html');
+if (SB.sbAuth.isAuthenticated()) location.replace('/admin/dashboard.html');
 
 // Map short usernames to full emails for convenience.
 // Keep email format internally — Supabase Auth requires it.
@@ -77,7 +77,7 @@ form.addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value;
   try {
     await SB.sbAuth.signInWithPassword({ email, password });
-    location.replace('/admin/inbox.html');
+    location.replace('/admin/dashboard.html');
   } catch (e) {
     err.textContent = '로그인 실패 — 아이디 또는 비밀번호를 확인해주세요.';
     err.style.display = 'block';

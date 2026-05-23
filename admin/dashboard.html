@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Dashboard · Medifluencer Admin</title>
+<link rel="stylesheet" href="admin.css">
+<style>
+/* ---- Dashboard-specific styles ---- */
+.dash-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-bottom:24px}
+@media (max-width:1100px){.dash-grid{grid-template-columns:repeat(6,1fr)}}
+@media (max-width:720px){.dash-grid{grid-template-columns:repeat(2,1fr)}}
+
+.card{
+  background:#fff;border:1px solid var(--a-line);border-radius:10px;
+  padding:20px 22px;position:relative;
+  display:flex;flex-direction:column;
+}
+.card-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.card-head h3{font-size:13px;font-weight:600;color:var(--a-navy);letter-spacing:-.005em}
+.card-head .card-meta{font-size:11px;color:var(--a-ink-3);letter-spacing:.04em}
+
+/* Hero KPI cards (col-3 each) */
+.kpi-card{grid-column:span 3}
+@media (max-width:1100px){.kpi-card{grid-column:span 3}}
+@media (max-width:720px){.kpi-card{grid-column:span 1}}
+.kpi-label{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--a-ink-3);font-weight:600;margin-bottom:8px}
+.kpi-val{font-family:'Instrument Serif',serif;font-style:italic;font-size:38px;color:var(--a-navy);letter-spacing:-0.025em;line-height:1;margin-bottom:6px}
+.kpi-delta{font-size:12px;color:var(--a-ink-3);font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.kpi-delta.up{color:var(--a-success)}
+.kpi-delta.down{color:var(--a-danger)}
+.kpi-delta.neutral{color:var(--a-ink-3)}
+.kpi-card::before{content:"";position:absolute;top:0;left:0;width:28px;height:2px;background:var(--a-gold)}
+.kpi-card.kpi-alert::before{background:var(--a-danger)}
+.kpi-card.kpi-good::before{background:var(--a-success)}
+
+/* Wide chart card */
+.span-8{grid-column:span 8}
+.span-6{grid-column:span 6}
+.span-4{grid-column:span 4}
+.span-12{grid-column:span 12}
+@media (max-width:1100px){
+  .span-8,.span-6,.span-4,.span-12{grid-column:span 6}
+}
+@media (max-width:720px){
+  .span-8,.span-6,.span-4,.span-12{grid-column:span 2}
+}
+
+/* Bar chart (daily trend) — pure SVG */
+.bars-wrap{width:100%;height:200px;position:relative}
+.bars-wrap svg{width:100%;height:100%;display:block}
+.bars-axis{font-size:10px;fill:var(--a-ink-3);font-family:'JetBrains Mono',monospace}
+
+/* Topic bar list */
+.bar-list{display:flex;flex-direction:column;gap:11px}
+.bar-row{display:grid;grid-template-columns:90px 1fr 32px;align-items:center;gap:10px;font-size:13px}
+.bar-row .bar-label{color:var(--a-ink-2);font-weight:500;font-size:12.5px;text-transform:capitalize}
+.bar-row .bar-track{height:8px;background:var(--a-bg-soft);border-radius:4px;overflow:hidden;position:relative}
+.bar-row .bar-fill{height:100%;background:linear-gradient(90deg,var(--a-gold) 0%,var(--a-gold-deep) 100%);border-radius:4px;transition:width .4s cubic-bezier(.2,.8,.2,1)}
+.bar-row .bar-count{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--a-ink-2);text-align:right;font-variant-numeric:tabular-nums}
+
+/* Funnel rows */
+.funnel{display:flex;flex-direction:column;gap:8px}
+.fn-row{display:grid;grid-template-columns:90px 1fr 50px;align-items:center;gap:10px;font-size:13px}
+.fn-track{height:30px;background:var(--a-bg-soft);border-radius:6px;overflow:hidden;position:relative;display:flex;align-items:center}
+.fn-fill{height:100%;display:flex;align-items:center;padding:0 12px;color:#fff;font-weight:600;font-size:12px;border-radius:6px;transition:width .4s cubic-bezier(.2,.8,.2,1)}
+.fn-fill.fn-new{background:linear-gradient(90deg,#F59E0B 0%,#D97706 100%)}
+.fn-fill.fn-rev{background:linear-gradient(90deg,#3B82F6 0%,#1F5FA8 100%)}
+.fn-fill.fn-rep{background:linear-gradient(90deg,#10B981 0%,#059669 100%)}
+.fn-fill.fn-cls{background:linear-gradient(90deg,#64748B 0%,#475569 100%)}
+.fn-label{font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--a-ink-2)}
+.fn-pct{font-size:11px;color:var(--a-ink-3);font-variant-numeric:tabular-nums;text-align:right}
+
+/* Worklist (overdue inquiries) */
+.worklist{display:flex;flex-direction:column;gap:0}
+.wl-item{
+  display:grid;grid-template-columns:1fr auto;align-items:flex-start;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--a-line-2);
+}
+.wl-item:last-child{border-bottom:none}
+.wl-org{font-weight:600;color:var(--a-navy);font-size:13.5px;line-height:1.35}
+.wl-meta{font-size:11.5px;color:var(--a-ink-3);margin-top:2px}
+.wl-age{font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;background:#FEE2E2;color:#991B1B;letter-spacing:.04em;flex-shrink:0;text-align:center;min-width:64px}
+.wl-age.warn{background:#FEF3C7;color:#92400E}
+
+/* Content table */
+.content-list{display:flex;flex-direction:column;gap:0}
+.cl-item{
+  display:grid;grid-template-columns:1fr 60px 80px;align-items:center;gap:10px;
+  padding:10px 0;border-bottom:1px solid var(--a-line-2);font-size:13px;
+}
+.cl-item:last-child{border-bottom:none}
+.cl-title{color:var(--a-navy);font-weight:500;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl-title:hover{color:var(--a-gold-deep);text-decoration:underline}
+.cl-views{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--a-ink-2);text-align:right;font-variant-numeric:tabular-nums}
+.cl-date{font-size:11.5px;color:var(--a-ink-3);text-align:right}
+
+/* Empty state inside card */
+.card-empty{padding:30px 10px;text-align:center;color:#94A3B8;font-size:13px}
+
+/* Period switcher */
+.period-tabs{display:flex;gap:4px;background:var(--a-bg-soft);padding:3px;border-radius:6px}
+.period-tabs button{padding:5px 10px;border-radius:4px;font-size:11.5px;font-weight:500;color:var(--a-ink-3);background:transparent;border:none;cursor:pointer;transition:all .15s ease;font-variant-numeric:tabular-nums}
+.period-tabs button.active{background:#fff;color:var(--a-navy);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+
+/* Insight callout */
+.insight{
+  margin-top:8px;padding:10px 14px;
+  background:linear-gradient(135deg,rgba(184,149,103,.07) 0%,rgba(31,95,168,.05) 100%);
+  border-left:2px solid var(--a-gold);border-radius:0 6px 6px 0;
+  font-size:12.5px;color:var(--a-ink-2);line-height:1.55;
+}
+.insight strong{color:var(--a-navy)}
+</style>
+</head>
+<body>
+<div class="admin-shell">
+  <main class="admin-main">
+    <header class="admin-head">
+      <div>
+        <h1>Dashboard</h1>
+        <p>비즈니스 디벨롭먼트의 핵심 지표 · 최근 30일 기준</p>
+      </div>
+      <div class="actions">
+        <button class="btn-sec" id="refreshBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          새로고침
+        </button>
+      </div>
+    </header>
+
+    <!-- HERO KPI -->
+    <div class="dash-grid">
+      <div class="card kpi-card" id="kpiTotalCard">
+        <div class="kpi-label">누적 문의</div>
+        <div class="kpi-val" id="kpiTotal">—</div>
+        <div class="kpi-delta neutral" id="kpiTotalDelta">전체 기간</div>
+      </div>
+      <div class="card kpi-card" id="kpi30Card">
+        <div class="kpi-label">최근 30일 신규</div>
+        <div class="kpi-val" id="kpi30">—</div>
+        <div class="kpi-delta" id="kpi30Delta">vs 이전 30일</div>
+      </div>
+      <div class="card kpi-card kpi-alert" id="kpiOverdueCard">
+        <div class="kpi-label">미응답 24h+</div>
+        <div class="kpi-val" id="kpiOverdue">—</div>
+        <div class="kpi-delta neutral" id="kpiOverdueDelta">즉시 액션 필요</div>
+      </div>
+      <div class="card kpi-card kpi-good" id="kpiRespCard">
+        <div class="kpi-label">평균 응답시간</div>
+        <div class="kpi-val" id="kpiResp">—</div>
+        <div class="kpi-delta neutral" id="kpiRespDelta">replied 기준</div>
+      </div>
+    </div>
+
+    <!-- INQUIRY TREND + TOPIC MIX -->
+    <div class="dash-grid">
+      <div class="card span-8">
+        <div class="card-head">
+          <h3>일별 문의 추이</h3>
+          <div class="period-tabs" id="periodTabs">
+            <button data-days="7" class="">7일</button>
+            <button data-days="30" class="active">30일</button>
+            <button data-days="90" class="">90일</button>
+          </div>
+        </div>
+        <div class="bars-wrap"><svg id="trendSvg" preserveAspectRatio="none"></svg></div>
+        <div class="insight" id="trendInsight">데이터 분석 중…</div>
+      </div>
+
+      <div class="card span-4">
+        <div class="card-head">
+          <h3>관심 영역 분포</h3>
+          <span class="card-meta">최근 30일</span>
+        </div>
+        <div class="bar-list" id="topicList"></div>
+      </div>
+    </div>
+
+    <!-- FUNNEL + WORKLIST -->
+    <div class="dash-grid">
+      <div class="card span-6">
+        <div class="card-head">
+          <h3>Inquiry Funnel</h3>
+          <span class="card-meta">전체 상태별</span>
+        </div>
+        <div class="funnel" id="funnelWrap"></div>
+        <div class="insight" id="funnelInsight">데이터 분석 중…</div>
+      </div>
+
+      <div class="card span-6">
+        <div class="card-head">
+          <h3>응답 대기 (24h+)</h3>
+          <span class="card-meta" id="worklistCount">—</span>
+        </div>
+        <div class="worklist" id="worklistWrap"></div>
+      </div>
+    </div>
+
+    <!-- CONTENT PERFORMANCE -->
+    <div class="dash-grid">
+      <div class="card span-6">
+        <div class="card-head">
+          <h3>콘텐츠 조회수 Top 5</h3>
+          <span class="card-meta">전체 기간</span>
+        </div>
+        <div class="content-list" id="topPostsWrap"></div>
+      </div>
+
+      <div class="card span-6">
+        <div class="card-head">
+          <h3>콘텐츠 요약</h3>
+          <span class="card-meta">발행 현황</span>
+        </div>
+        <div class="bar-list" id="tagList" style="margin-bottom:16px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding-top:14px;border-top:1px solid var(--a-line-2)">
+          <div style="text-align:center"><div style="font-family:'Instrument Serif',serif;font-style:italic;font-size:24px;color:var(--a-navy)" id="ctTotal">—</div><div style="font-size:11px;color:var(--a-ink-3);letter-spacing:.06em;text-transform:uppercase;margin-top:2px">전체</div></div>
+          <div style="text-align:center"><div style="font-family:'Instrument Serif',serif;font-style:italic;font-size:24px;color:var(--a-navy)" id="ctPub">—</div><div style="font-size:11px;color:var(--a-ink-3);letter-spacing:.06em;text-transform:uppercase;margin-top:2px">발행</div></div>
+          <div style="text-align:center"><div style="font-family:'Instrument Serif',serif;font-style:italic;font-size:24px;color:var(--a-navy)" id="ctViews7">—</div><div style="font-size:11px;color:var(--a-ink-3);letter-spacing:.06em;text-transform:uppercase;margin-top:2px">7일 조회</div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/supabase.js"></script>
+<script src="admin.js"></script>
+<script>
+MFAdmin.attachShell('dashboard');
+
+// ---------- Utility ----------
+function dayKey(d) { return new Date(d).toISOString().slice(0,10); }
+function fmtMins(mins) {
+  if (mins == null) return '—';
+  if (mins < 60) return Math.round(mins) + '분';
+  if (mins < 1440) return (mins/60).toFixed(1) + '시간';
+  return (mins/1440).toFixed(1) + '일';
+}
+function pct(n, d) { return d ? Math.round((n/d)*1000)/10 : 0; }
+
+let allInquiries = [], allPosts = [], allViews = [];
+let activePeriod = 30;
+
+async function load() {
+  try {
+    const [inq, posts, views] = await Promise.all([
+      SB.sbSelect('inquiries', '?select=*&order=created_at.desc&limit=1000'),
+      SB.sbSelect('blog_posts', '?select=*&order=created_at.desc&limit=200'),
+      SB.sbSelect('page_views', '?select=slug,created_at&order=created_at.desc&limit=5000'),
+    ]);
+    allInquiries = inq || [];
+    allPosts = posts || [];
+    allViews = views || [];
+    renderAll();
+  } catch (e) {
+    console.error(e);
+    MFAdmin.toast('대시보드 로딩 실패: ' + e.message, {error:true});
+  }
+}
+
+function renderAll() {
+  renderKPIs();
+  renderTrend(activePeriod);
+  renderTopics();
+  renderFunnel();
+  renderWorklist();
+  renderTopPosts();
+  renderContentSummary();
+}
+
+// ---------- HERO KPI ----------
+function renderKPIs() {
+  const now = Date.now();
+  const D30 = 30 * 86400 * 1000;
+  const D60 = 60 * 86400 * 1000;
+
+  const total = allInquiries.length;
+  const last30 = allInquiries.filter(r => now - new Date(r.created_at).getTime() < D30).length;
+  const prev30 = allInquiries.filter(r => {
+    const age = now - new Date(r.created_at).getTime();
+    return age >= D30 && age < D60;
+  }).length;
+
+  // Overdue: status === 'new' AND older than 24h
+  const overdue = allInquiries.filter(r => r.status === 'new' && now - new Date(r.created_at).getTime() > 86400 * 1000).length;
+
+  // Avg response time: replied items, time between created_at and updated_at (approx)
+  // Note: We don't track exact "replied at" — using updated_at as proxy.
+  // If updated_at == created_at, skip (never updated).
+  const repliedRows = allInquiries.filter(r => r.status === 'replied' || r.status === 'closed');
+  let avgMins = null;
+  if (repliedRows.length > 0) {
+    // We don't have updated_at in select; use a heuristic based on status presence.
+    // For now compute from those whose admin_note is non-null OR status changed.
+    // Falling back to created_at-based approximation: not actually accurate without updated_at column in fetch.
+    // We'll re-fetch with updated_at if needed; here use a placeholder.
+    const withTime = repliedRows.filter(r => r.updated_at && r.updated_at !== r.created_at);
+    if (withTime.length > 0) {
+      const diffs = withTime.map(r => (new Date(r.updated_at) - new Date(r.created_at)) / 60000);
+      avgMins = diffs.reduce((a,b)=>a+b,0) / diffs.length;
+    }
+  }
+
+  document.getElementById('kpiTotal').textContent = total;
+  document.getElementById('kpi30').textContent = last30;
+  document.getElementById('kpiOverdue').textContent = overdue;
+  document.getElementById('kpiResp').textContent = fmtMins(avgMins);
+
+  // Delta vs prev 30d
+  const deltaEl = document.getElementById('kpi30Delta');
+  if (prev30 > 0) {
+    const d = pct(last30 - prev30, prev30);
+    deltaEl.textContent = (d >= 0 ? '↑ ' : '↓ ') + Math.abs(d) + '% vs 이전 30일';
+    deltaEl.className = 'kpi-delta ' + (d > 0 ? 'up' : d < 0 ? 'down' : 'neutral');
+  } else if (last30 > 0) {
+    deltaEl.textContent = '신규 (이전 30일 없음)';
+    deltaEl.className = 'kpi-delta up';
+  } else {
+    deltaEl.textContent = '문의 없음';
+    deltaEl.className = 'kpi-delta neutral';
+  }
+
+  // Overdue alert state
+  const overdueCard = document.getElementById('kpiOverdueCard');
+  overdueCard.classList.toggle('kpi-alert', overdue > 0);
+  overdueCard.classList.toggle('kpi-good', overdue === 0);
+  document.getElementById('kpiOverdueDelta').textContent = overdue > 0 ? '즉시 액션 필요' : '모두 처리됨';
+}
+
+// ---------- DAILY TREND ----------
+function renderTrend(days) {
+  const now = new Date();
+  const buckets = {};
+  for (let i = 0; i < days; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    buckets[dayKey(d)] = 0;
+  }
+  const cutoff = now.getTime() - days * 86400 * 1000;
+  allInquiries.forEach(r => {
+    const t = new Date(r.created_at).getTime();
+    if (t < cutoff) return;
+    const k = dayKey(r.created_at);
+    if (buckets[k] !== undefined) buckets[k]++;
+  });
+  const keys = Object.keys(buckets).sort();
+  const vals = keys.map(k => buckets[k]);
+  const max = Math.max(1, ...vals);
+  const avg = vals.reduce((a,b)=>a+b,0) / vals.length;
+
+  // Build SVG
+  const svg = document.getElementById('trendSvg');
+  const W = 100, H = 100; // viewBox units (percent-like)
+  const barW = (W - 4) / keys.length;
+  const padTop = 6, padBot = 14;
+  const chartH = H - padTop - padBot;
+
+  let bars = '';
+  keys.forEach((k, i) => {
+    const v = buckets[k];
+    const h = max > 0 ? (v / max) * chartH : 0;
+    const x = 2 + i * barW;
+    const y = padTop + (chartH - h);
+    const date = new Date(k);
+    const isToday = dayKey(new Date()) === k;
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    const color = isToday ? '#B89567' : isWeekend ? '#94A3B8' : '#0A2540';
+    bars += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${(barW - 0.6).toFixed(2)}" height="${h.toFixed(2)}" fill="${color}" opacity="${v > 0 ? '0.85' : '0.18'}" rx="0.4"><title>${k}: ${v}건</title></rect>`;
+  });
+
+  // X-axis labels: first, mid, last
+  const labels = [
+    { i: 0,                  text: keys[0]?.slice(5) },
+    { i: Math.floor(keys.length/2), text: keys[Math.floor(keys.length/2)]?.slice(5) },
+    { i: keys.length - 1,     text: keys[keys.length-1]?.slice(5) },
+  ];
+  let labelEls = labels.map(l => {
+    const x = 2 + l.i * barW + barW/2;
+    return `<text x="${x.toFixed(2)}" y="${(H - 2).toFixed(2)}" class="bars-axis" text-anchor="middle">${l.text || ''}</text>`;
+  }).join('');
+
+  // Avg line
+  if (avg > 0) {
+    const avgY = padTop + (chartH - (avg/max) * chartH);
+    labelEls += `<line x1="2" x2="${W-2}" y1="${avgY.toFixed(2)}" y2="${avgY.toFixed(2)}" stroke="#B89567" stroke-width="0.3" stroke-dasharray="1,1" opacity="0.7"/>`;
+    labelEls += `<text x="${(W-2).toFixed(2)}" y="${(avgY - 1).toFixed(2)}" class="bars-axis" text-anchor="end" fill="#B89567">평균 ${avg.toFixed(1)}</text>`;
+  }
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = bars + labelEls;
+
+  // Insight
+  const total = vals.reduce((a,b)=>a+b,0);
+  const peakIdx = vals.indexOf(Math.max(...vals));
+  const peakDay = keys[peakIdx];
+  const inEl = document.getElementById('trendInsight');
+  if (total === 0) {
+    inEl.innerHTML = `<strong>${days}일간 신규 문의가 없습니다.</strong> 메인/블로그 트래픽을 확인하고, contact 폼의 진입 경로를 점검하는 것이 우선.`;
+  } else {
+    const peakWeekday = ['일','월','화','수','목','금','토'][new Date(peakDay).getDay()];
+    inEl.innerHTML = `최근 ${days}일간 <strong>${total}건</strong>, 일평균 <strong>${avg.toFixed(1)}건</strong>. 최고치는 <strong>${peakDay} (${peakWeekday}, ${vals[peakIdx]}건)</strong>. 요일 패턴이 보이면 콘텐츠 발행·광고 타이밍을 그 요일 직전에 정렬하세요.`;
+  }
+}
+
+// ---------- TOPIC DISTRIBUTION ----------
+function renderTopics() {
+  const now = Date.now();
+  const D30 = 30 * 86400 * 1000;
+  const recent = allInquiries.filter(r => now - new Date(r.created_at).getTime() < D30);
+  const counts = {};
+  recent.forEach(r => {
+    const t = (r.topic || 'general').toLowerCase();
+    counts[t] = (counts[t] || 0) + 1;
+  });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0, 6);
+  const max = sorted.length ? sorted[0][1] : 1;
+  const wrap = document.getElementById('topicList');
+  if (!sorted.length) {
+    wrap.innerHTML = '<div class="card-empty">최근 30일 데이터 없음</div>';
+    return;
+  }
+  wrap.innerHTML = sorted.map(([label, count]) => `
+    <div class="bar-row">
+      <div class="bar-label">${MFAdmin.escape(label)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(count/max)*100}%"></div></div>
+      <div class="bar-count">${count}</div>
+    </div>`).join('');
+}
+
+// ---------- INQUIRY FUNNEL ----------
+function renderFunnel() {
+  const counts = { new:0, reviewing:0, replied:0, closed:0 };
+  allInquiries.forEach(r => { if (counts[r.status] !== undefined) counts[r.status]++; });
+  const total = Object.values(counts).reduce((a,b)=>a+b,0);
+  const max = Math.max(1, ...Object.values(counts));
+
+  const rows = [
+    { key:'new',       label:'New',       cls:'fn-new', count:counts.new },
+    { key:'reviewing', label:'Reviewing', cls:'fn-rev', count:counts.reviewing },
+    { key:'replied',   label:'Replied',   cls:'fn-rep', count:counts.replied },
+    { key:'closed',    label:'Closed',    cls:'fn-cls', count:counts.closed },
+  ];
+
+  document.getElementById('funnelWrap').innerHTML = rows.map(r => `
+    <div class="fn-row">
+      <div class="fn-label">${r.label}</div>
+      <div class="fn-track"><div class="fn-fill ${r.cls}" style="width:${Math.max(8, (r.count/max)*100)}%">${r.count}</div></div>
+      <div class="fn-pct">${pct(r.count, total)}%</div>
+    </div>`).join('');
+
+  // Insight: replied rate
+  const repliedRate = pct(counts.replied + counts.closed, total);
+  const stuck = counts.reviewing;
+  const inEl = document.getElementById('funnelInsight');
+  if (total === 0) {
+    inEl.innerHTML = '<strong>문의 데이터 없음.</strong>';
+  } else if (stuck > Math.max(3, counts.replied)) {
+    inEl.innerHTML = `Reviewing이 <strong>${stuck}건</strong> 적체. Replied(${counts.replied})보다 많아 병목 신호 — 응답 SLA 점검 필요.`;
+  } else {
+    inEl.innerHTML = `응답 완료율 <strong>${repliedRate}%</strong> (replied + closed / 전체). 업계 평균 60~70% 기준.`;
+  }
+}
+
+// ---------- WORKLIST (overdue inquiries) ----------
+function renderWorklist() {
+  const now = Date.now();
+  const overdue = allInquiries
+    .filter(r => r.status === 'new' && now - new Date(r.created_at).getTime() > 86400 * 1000)
+    .sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+
+  document.getElementById('worklistCount').textContent = overdue.length + '건';
+  const wrap = document.getElementById('worklistWrap');
+  if (!overdue.length) {
+    wrap.innerHTML = `<div class="card-empty"><strong style="color:var(--a-success);display:block;margin-bottom:4px">✓ 모두 처리됨</strong>24시간 이상 묵힌 문의가 없습니다.</div>`;
+    return;
+  }
+  wrap.innerHTML = overdue.slice(0, 6).map(r => {
+    const age = now - new Date(r.created_at).getTime();
+    const days = Math.floor(age / (86400 * 1000));
+    const hrs = Math.floor(age / (3600 * 1000));
+    const ageText = days > 0 ? `${days}일+` : `${hrs}h`;
+    const warn = days < 2;
+    return `
+      <a class="wl-item" href="/admin/inbox.html" style="text-decoration:none">
+        <div>
+          <div class="wl-org">${MFAdmin.escape(r.org || r.name)}</div>
+          <div class="wl-meta">${MFAdmin.escape(r.topic || 'general')} · ${MFAdmin.escape(r.email)}</div>
+        </div>
+        <div class="wl-age ${warn ? 'warn' : ''}">${ageText}</div>
+      </a>`;
+  }).join('');
+}
+
+// ---------- CONTENT: TOP POSTS BY VIEWS ----------
+function renderTopPosts() {
+  // Build view counts per slug
+  const counts = {};
+  allViews.forEach(v => { counts[v.slug] = (counts[v.slug] || 0) + 1; });
+
+  // Join with published posts
+  const published = allPosts.filter(p => p.status === 'published' && p.published_at && new Date(p.published_at) <= new Date());
+  const enriched = published.map(p => ({
+    slug: p.slug,
+    title: p.title_ko || p.title_en || p.slug,
+    views: counts[p.slug] || 0,
+    published_at: p.published_at,
+  })).sort((a,b) => b.views - a.views).slice(0, 5);
+
+  const wrap = document.getElementById('topPostsWrap');
+  if (!enriched.length || enriched.every(p => p.views === 0)) {
+    if (!enriched.length) {
+      wrap.innerHTML = '<div class="card-empty">발행된 글이 없습니다.</div>';
+    } else {
+      wrap.innerHTML = `<div class="card-empty"><strong style="display:block;margin-bottom:4px">아직 조회 데이터 없음</strong>방문자가 블로그 글을 보면 여기에 누적됩니다.</div>`;
+    }
+    return;
+  }
+  wrap.innerHTML = enriched.map(p => `
+    <div class="cl-item">
+      <a class="cl-title" href="/blog-post.html?slug=${encodeURIComponent(p.slug)}" target="_blank" rel="noopener" title="${MFAdmin.escape(p.title)}">${MFAdmin.escape(p.title)}</a>
+      <div class="cl-views">${p.views}</div>
+      <div class="cl-date">${MFAdmin.fmtDateShort(p.published_at)}</div>
+    </div>`).join('');
+}
+
+// ---------- CONTENT SUMMARY ----------
+function renderContentSummary() {
+  const now = new Date();
+  const D7 = 7 * 86400 * 1000;
+
+  const counts = { medical:0, methodology:0, case:0, announcement:0, news:0 };
+  let pub = 0;
+  allPosts.forEach(p => {
+    if (p.status === 'published') pub++;
+    if (counts[p.tag] !== undefined) counts[p.tag]++;
+  });
+
+  const sorted = Object.entries(counts).filter(([_,v]) => v > 0).sort((a,b)=>b[1]-a[1]);
+  const max = sorted.length ? sorted[0][1] : 1;
+
+  document.getElementById('tagList').innerHTML = sorted.length ? sorted.map(([label,count]) => `
+    <div class="bar-row">
+      <div class="bar-label">${label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(count/max)*100}%"></div></div>
+      <div class="bar-count">${count}</div>
+    </div>`).join('') : '<div class="card-empty">태그 없음</div>';
+
+  // KPIs
+  document.getElementById('ctTotal').textContent = allPosts.length;
+  document.getElementById('ctPub').textContent = pub;
+  const views7 = allViews.filter(v => now - new Date(v.created_at) < D7).length;
+  document.getElementById('ctViews7').textContent = views7;
+}
+
+// ---------- Period switcher ----------
+document.getElementById('periodTabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-days]');
+  if (!btn) return;
+  document.querySelectorAll('#periodTabs button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activePeriod = parseInt(btn.dataset.days, 10);
+  renderTrend(activePeriod);
+});
+
+document.getElementById('refreshBtn').onclick = load;
+load();
+</script>
+</body>
+</html>
