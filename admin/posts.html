@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Posts · Medifluencer Admin</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <main class="admin-main">
+    <header class="admin-head">
+      <div>
+        <h1>Posts</h1>
+        <p>블로그 / 소식 글을 발행하고 관리합니다.</p>
+      </div>
+      <div class="actions">
+        <button class="btn-sec" id="refreshBtn">↻ Refresh</button>
+        <a href="post-edit.html" class="btn-pri">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          새 글 작성
+        </a>
+      </div>
+    </header>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">전체</div><div class="stat-val" id="stTotal">0</div></div>
+      <div class="stat-card"><div class="stat-label">Published</div><div class="stat-val" id="stPublished">0</div></div>
+      <div class="stat-card"><div class="stat-label">Drafts</div><div class="stat-val" id="stDrafts">0</div><div class="stat-sub">발행 대기 중</div></div>
+      <div class="stat-card"><div class="stat-label">Archived</div><div class="stat-val" id="stArchived">0</div></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:40%">제목</th>
+          <th style="width:14%">태그</th>
+          <th style="width:14%">상태</th>
+          <th style="width:16%">발행일</th>
+          <th style="width:16%">관리</th>
+        </tr></thead>
+        <tbody id="postRows">
+          <tr><td colspan="5" class="empty">불러오는 중…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/supabase.js"></script>
+<script src="admin.js"></script>
+<script>
+MFAdmin.attachShell('posts');
+
+const tbody = document.getElementById('postRows');
+
+async function load() {
+  tbody.innerHTML = '<tr><td colspan="5" class="empty">불러오는 중…</td></tr>';
+  try {
+    const rows = await SB.sbSelect('blog_posts', '?select=*&order=created_at.desc&limit=200');
+    render(rows);
+    updateStats(rows);
+  } catch (e) {
+    console.error(e);
+    tbody.innerHTML = `<tr><td colspan="5" class="empty">불러오기 실패: ${MFAdmin.escape(e.message)}</td></tr>`;
+  }
+}
+
+function updateStats(rows) {
+  document.getElementById('stTotal').textContent = rows.length;
+  document.getElementById('stPublished').textContent = rows.filter(r => r.status === 'published').length;
+  document.getElementById('stDrafts').textContent = rows.filter(r => r.status === 'draft').length;
+  document.getElementById('stArchived').textContent = rows.filter(r => r.status === 'archived').length;
+}
+
+function render(rows) {
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">아직 글이 없습니다. <a class="btn-link" href="post-edit.html">첫 글을 작성하세요 →</a></td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr data-id="${r.id}">
+      <td>
+        <div class="cell-name">${MFAdmin.escape(r.title_ko)}</div>
+        <div class="cell-meta">/${MFAdmin.escape(r.slug)}</div>
+      </td>
+      <td><span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8E6E45;background:#EFE5D2;padding:3px 9px;border-radius:3px">${MFAdmin.escape(r.tag || 'medical')}</span></td>
+      <td><span class="cell-status ${r.status}">${r.status}</span></td>
+      <td style="font-size:12.5px;color:#64748B">${r.published_at ? MFAdmin.fmtDateShort(r.published_at) : '—'}</td>
+      <td>
+        <a class="btn-link" href="post-edit.html?id=${r.id}">편집</a>
+        ${r.status === 'published' ? `<a class="btn-link" target="_blank" href="../blog-post.html?slug=${encodeURIComponent(r.slug)}" style="margin-left:10px">미리보기 ↗</a>` : ''}
+      </td>
+    </tr>`).join('');
+}
+
+document.getElementById('refreshBtn').onclick = load;
+load();
+</script>
+</body>
+</html>

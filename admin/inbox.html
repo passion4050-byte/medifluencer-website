@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inbox · Medifluencer Admin</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <main class="admin-main">
+    <header class="admin-head">
+      <div>
+        <h1>Inbox</h1>
+        <p>웹사이트 Contact 폼에서 들어온 문의 목록입니다.</p>
+      </div>
+      <div class="actions">
+        <button class="btn-sec" id="refreshBtn">↻ Refresh</button>
+      </div>
+    </header>
+
+    <div class="stat-grid" id="stats">
+      <div class="stat-card"><div class="stat-label">전체</div><div class="stat-val" id="stTotal">0</div></div>
+      <div class="stat-card"><div class="stat-label">New</div><div class="stat-val" id="stNew">0</div><div class="stat-sub">아직 확인 안 한 문의</div></div>
+      <div class="stat-card"><div class="stat-label">Reviewing</div><div class="stat-val" id="stReviewing">0</div></div>
+      <div class="stat-card"><div class="stat-label">Replied</div><div class="stat-val" id="stReplied">0</div></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:20%">기관 / 담당자</th>
+          <th style="width:14%">관심 영역</th>
+          <th>메시지</th>
+          <th style="width:12%">받은 일시</th>
+          <th style="width:10%">상태</th>
+        </tr></thead>
+        <tbody id="inquiryRows">
+          <tr><td colspan="5" class="empty">불러오는 중…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<div class="drawer" id="drawer">
+  <div class="drawer-panel" id="drawerPanel"></div>
+</div>
+
+<script src="../assets/supabase.js"></script>
+<script src="admin.js"></script>
+<script>
+MFAdmin.attachShell('inbox');
+
+const tbody = document.getElementById('inquiryRows');
+const drawer = document.getElementById('drawer');
+const panel = document.getElementById('drawerPanel');
+
+async function load() {
+  tbody.innerHTML = '<tr><td colspan="5" class="empty">불러오는 중…</td></tr>';
+  try {
+    const rows = await SB.sbSelect('inquiries', '?select=*&order=created_at.desc&limit=200');
+    render(rows);
+    updateStats(rows);
+  } catch (e) {
+    console.error(e);
+    tbody.innerHTML = `<tr><td colspan="5" class="empty">불러오기 실패: ${MFAdmin.escape(e.message)}</td></tr>`;
+  }
+}
+
+function updateStats(rows) {
+  const total = rows.length;
+  const news = rows.filter(r => r.status === 'new').length;
+  const rev = rows.filter(r => r.status === 'reviewing').length;
+  const rep = rows.filter(r => r.status === 'replied').length;
+  document.getElementById('stTotal').textContent = total;
+  document.getElementById('stNew').textContent = news;
+  document.getElementById('stReviewing').textContent = rev;
+  document.getElementById('stReplied').textContent = rep;
+  const badge = document.getElementById('inboxBadge');
+  if (news > 0) { badge.style.display = 'inline-block'; badge.textContent = news; }
+  else badge.style.display = 'none';
+}
+
+function render(rows) {
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">아직 문의가 없습니다.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr data-id="${r.id}" style="cursor:pointer">
+      <td>
+        <div class="cell-name">${MFAdmin.escape(r.org || r.name)}</div>
+        <div class="cell-meta">${MFAdmin.escape(r.name)} · ${MFAdmin.escape(r.email)}</div>
+      </td>
+      <td>${MFAdmin.escape(r.topic || '—')}</td>
+      <td style="color:#475569">${MFAdmin.escape((r.message || '').slice(0, 90))}${(r.message || '').length > 90 ? '…' : ''}</td>
+      <td style="font-size:12.5px;color:#64748B">${MFAdmin.fmtDate(r.created_at)}</td>
+      <td><span class="cell-status ${r.status}">${r.status}</span></td>
+    </tr>`).join('');
+  tbody.querySelectorAll('tr[data-id]').forEach(tr => {
+    tr.addEventListener('click', () => openDrawer(tr.dataset.id, rows));
+  });
+}
+
+function openDrawer(id, rows) {
+  const r = rows.find(x => x.id === id);
+  if (!r) return;
+  panel.innerHTML = `
+    <h2>${MFAdmin.escape(r.org || r.name)}</h2>
+    <p style="color:#64748B;font-size:13px;margin-bottom:6px">${MFAdmin.escape(r.name)} · <a href="mailto:${MFAdmin.escape(r.email)}">${MFAdmin.escape(r.email)}</a></p>
+    <p style="font-size:12px;color:#94A3B8">${MFAdmin.fmtDate(r.created_at)}</p>
+
+    <div class="field"><label>관심 영역</label><div class="val">${MFAdmin.escape(r.topic || '—')}</div></div>
+    <div class="field"><label>연락처</label><div class="val">${MFAdmin.escape(r.phone || '—')}</div></div>
+    <div class="field"><label>메시지</label><div class="val">${MFAdmin.escape(r.message || '')}</div></div>
+
+    <div class="field"><label>관리자 메모</label>
+      <textarea id="noteText">${MFAdmin.escape(r.admin_note || '')}</textarea>
+    </div>
+
+    <div class="controls">
+      <select id="statusSel">
+        <option value="new" ${r.status==='new'?'selected':''}>new</option>
+        <option value="reviewing" ${r.status==='reviewing'?'selected':''}>reviewing</option>
+        <option value="replied" ${r.status==='replied'?'selected':''}>replied</option>
+        <option value="closed" ${r.status==='closed'?'selected':''}>closed</option>
+      </select>
+      <button class="btn-pri" id="saveBtn">저장</button>
+      <a class="btn-sec" href="mailto:${MFAdmin.escape(r.email)}?subject=${encodeURIComponent('[메디플루언서] 회신 — ' + (r.org || r.name))}&body=${encodeURIComponent('안녕하세요 ' + (r.name) + '님,\\n\\n메디플루언서 입니다.')}">메일로 회신</a>
+      <button class="btn-danger" id="delBtn">삭제</button>
+      <button class="btn-link" style="margin-left:auto" id="closeBtn">닫기</button>
+    </div>`;
+  drawer.classList.add('open');
+
+  document.getElementById('closeBtn').onclick = () => drawer.classList.remove('open');
+  document.getElementById('saveBtn').onclick = async () => {
+    const newStatus = document.getElementById('statusSel').value;
+    const newNote = document.getElementById('noteText').value;
+    try {
+      await SB.sbUpdate('inquiries', `id=eq.${id}`, { status: newStatus, admin_note: newNote });
+      MFAdmin.toast('저장됨');
+      drawer.classList.remove('open');
+      load();
+    } catch (e) { alert('저장 실패: ' + e.message); }
+  };
+  document.getElementById('delBtn').onclick = async () => {
+    if (!confirm('이 문의를 삭제하시겠습니까?')) return;
+    try {
+      await SB.sbDelete('inquiries', `id=eq.${id}`);
+      MFAdmin.toast('삭제됨');
+      drawer.classList.remove('open');
+      load();
+    } catch (e) { alert('삭제 실패: ' + e.message); }
+  };
+}
+
+drawer.addEventListener('click', (e) => { if (e.target === drawer) drawer.classList.remove('open'); });
+document.getElementById('refreshBtn').onclick = load;
+load();
+</script>
+</body>
+</html>

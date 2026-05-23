@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-ko="블로그 — Medifluencer" data-en="Blog — Medifluencer">블로그 — Medifluencer</title>
+<meta name="description" content="K-메디컬의 글로벌화에 대한 관점과 실증된 사례.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="%230A2540"/><path d="M9 22V10h2.4l3.1 7.4L17.6 10H20v12h-1.9v-8.1L15 22h-1.4L10.5 13.9V22z" fill="%23B89567"/></svg>'>
+<style>
+.blog-list{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+@media (max-width:960px){.blog-list{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.blog-list{grid-template-columns:1fr}}
+.blog-card{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.2,.8,.2,1), border-color .25s ease, box-shadow .3s ease;text-decoration:none;color:inherit}
+.blog-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 18px 36px -12px rgba(10,37,64,.16)}
+.blog-cover{aspect-ratio:16/10;background:linear-gradient(135deg, var(--navy) 0%, #143a66 100%);position:relative;overflow:hidden}
+.blog-cover-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-style:italic;font-size:72px;color:rgba(184,149,103,.5);letter-spacing:-0.04em}
+.blog-cover-fallback::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:32px 32px;mask-image:radial-gradient(ellipse at center, #000 30%, transparent 75%)}
+.blog-body{padding:28px 28px 32px;display:flex;flex-direction:column;flex:1;gap:14px}
+.blog-tag{display:inline-block;align-self:flex-start;font-size:10.5px;letter-spacing:.22em;font-weight:600;text-transform:uppercase;color:var(--gold-deep);background:var(--gold-soft);padding:5px 10px;border-radius:3px}
+.blog-title{font-size:19px;color:var(--navy);font-weight:700;line-height:1.35;letter-spacing:-0.01em}
+.blog-excerpt{font-size:14px;color:var(--ink-3);line-height:1.65;flex:1}
+.blog-meta{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--line-2);font-size:12px;color:var(--ink-4)}
+.blog-empty{text-align:center;padding:80px 0;color:var(--ink-3)}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a class="brand" href="index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M5 5h2.6l3.4 8 3.4-8H17v14h-2.1V9.3L11.6 19h-1.2L7.1 9.3V19H5z" fill="#B89567"/></svg></span><span class="brand-text"><span class="brand-name">Medifluencer</span><span class="brand-sub">with GINCON</span></span></a>
+    <nav class="nav-main">
+      <a class="nav-link" href="index.html"><span data-lang="ko">홈</span><span data-lang="en">Home</span></a>
+      <a class="nav-link" href="about.html"><span data-lang="ko">소개</span><span data-lang="en">About</span></a>
+      <a class="nav-link" href="services.html"><span data-lang="ko">서비스</span><span data-lang="en">Services</span></a>
+      <a class="nav-link" href="product.html"><span data-lang="ko">대표 패키지</span><span data-lang="en">Flagship</span></a>
+      <a class="nav-link" href="partnership.html"><span data-lang="ko">B2B 제휴</span><span data-lang="en">Partnership</span></a>
+      <a class="nav-link active" href="blog.html"><span data-lang="ko">블로그</span><span data-lang="en">Blog</span></a>
+      <a class="nav-link" href="contact.html"><span data-lang="ko">문의</span><span data-lang="en">Contact</span></a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang-toggle"><button class="lang-btn" data-lang="ko">KR</button><button class="lang-btn" data-lang="en">EN</button></div>
+      <button class="menu-toggle"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="page-hero">
+  <div class="aurora" aria-hidden="true">
+    <div class="aurora-orb o1"></div><div class="aurora-orb o2"></div><div class="aurora-orb o3"></div><div class="aurora-orb o4"></div>
+  </div>
+  <div class="constellation" aria-hidden="true">
+    <svg viewBox="0 0 1200 600" preserveAspectRatio="none">
+      <line class="c-line l1" x1="120" y1="80" x2="380" y2="180"/>
+      <line class="c-line l2" x1="380" y1="180" x2="640" y2="120"/>
+      <line class="c-line l3" x1="640" y1="120" x2="920" y2="240"/>
+      <circle class="c-dot" cx="120" cy="80" r="3"/>
+      <circle class="c-dot d2" cx="380" cy="180" r="3"/>
+      <circle class="c-dot d3" cx="640" cy="120" r="3"/>
+      <circle class="c-dot d4" cx="920" cy="240" r="3"/>
+    </svg>
+  </div>
+  <div class="container page-hero-inner">
+    <div class="eyebrow-mag" style="justify-content:center"><span class="num">Blog</span><span data-lang="ko">관점과 사례</span><span data-lang="en">Notes & Cases</span></div>
+    <h1><span data-lang="ko">K-메디컬의 다음 챕터,<br><em>매주 기록합니다</em></span><span data-lang="en">The next chapter of K-Medical,<br><em>written weekly</em></span></h1>
+    <p data-lang="ko">광고가 아닌 자산이 되는 콘텐츠를 만드는 우리의 관점, 그리고 그것이 실제 어떻게 작동했는지의 기록.</p>
+    <p data-lang="en">Our perspective on content that becomes an asset rather than an ad — and the proof of how it works.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div id="blog-list" class="blog-list">
+      <!-- populated by JS -->
+    </div>
+    <div id="blog-loading" style="text-align:center;padding:40px;color:var(--ink-3)">
+      <span data-lang="ko">불러오는 중…</span><span data-lang="en">Loading…</span>
+    </div>
+    <div id="blog-empty" class="blog-empty" style="display:none">
+      <p><span data-lang="ko">아직 발행된 글이 없습니다. 곧 첫 글을 올리겠습니다.</span><span data-lang="en">No posts yet — the first one is on its way.</span></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-name">Medifluencer</div>
+        <div class="footer-brand-tag">Spread Your Medical Value</div>
+        <p class="footer-blurb"><span data-lang="ko">대한민국 국회 진콘어워즈를 만들어 온 사단법인 GINCON과 함께하는 의료 전문 인플루언서 그룹.</span><span data-lang="en">The medical influencer group, in partnership with GINCON.</span></p>
+      </div>
+      <div class="footer-col">
+        <h4><span data-lang="ko">메뉴</span><span data-lang="en">Navigate</span></h4>
+        <ul>
+          <li><a href="index.html"><span data-lang="ko">홈</span><span data-lang="en">Home</span></a></li>
+          <li><a href="about.html"><span data-lang="ko">소개</span><span data-lang="en">About</span></a></li>
+          <li><a href="services.html"><span data-lang="ko">서비스</span><span data-lang="en">Services</span></a></li>
+          <li><a href="product.html"><span data-lang="ko">대표 패키지</span><span data-lang="en">Flagship</span></a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4><span data-lang="ko">파트너십</span><span data-lang="en">Partners</span></h4>
+        <ul>
+          <li>GINCON</li>
+          <li><span data-lang="ko">대한민국 국회</span><span data-lang="en">National Assembly of Korea</span></li>
+          <li>UN WFP</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4><span data-lang="ko">문의</span><span data-lang="en">Contact</span></h4>
+        <ul>
+          <li><a href="mailto:contact@gincon.org">contact@gincon.org</a></li>
+          <li>+82 10-8758-2750</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-mark">© 2026 Medifluencer Co., Ltd. <span data-lang="ko">· GINCON과 함께</span><span data-lang="en">· In partnership with GINCON</span></div>
+      <div><a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/supabase.js"></script>
+<script src="assets/main.js"></script>
+<script>
+(async () => {
+  const list = document.getElementById('blog-list');
+  const loading = document.getElementById('blog-loading');
+  const empty = document.getElementById('blog-empty');
+  try {
+    const posts = await SB.sbSelect('blog_posts',
+      '?select=slug,title_ko,title_en,excerpt_ko,excerpt_en,cover_url,tag,published_at,status&status=eq.published&order=published_at.desc');
+    loading.style.display = 'none';
+    if (!posts.length) { empty.style.display = 'block'; return; }
+    const lang = document.documentElement.lang || 'ko';
+    list.innerHTML = posts.map(p => {
+      const title = lang === 'ko' ? p.title_ko : (p.title_en || p.title_ko);
+      const excerpt = lang === 'ko' ? p.excerpt_ko : (p.excerpt_en || p.excerpt_ko);
+      const initial = (p.title_ko || '?').slice(0, 1);
+      const date = p.published_at ? new Date(p.published_at).toLocaleDateString(lang === 'ko' ? 'ko-KR' : 'en-US', { year:'numeric', month:'short', day:'numeric' }) : '';
+      const cover = p.cover_url
+        ? `<div class="blog-cover" style="background-image:url('${p.cover_url}');background-size:cover;background-position:center"></div>`
+        : `<div class="blog-cover"><div class="blog-cover-fallback">${initial}</div></div>`;
+      return `<a class="blog-card" href="blog-post.html?slug=${encodeURIComponent(p.slug)}" data-reveal>
+        ${cover}
+        <div class="blog-body">
+          <span class="blog-tag">${(p.tag || '').toUpperCase()}</span>
+          <h3 class="blog-title">${title || ''}</h3>
+          <p class="blog-excerpt">${excerpt || ''}</p>
+          <div class="blog-meta"><span>${date}</span><span>Read →</span></div>
+        </div>
+      </a>`;
+    }).join('');
+
+    // Re-run reveal observer on dynamically added cards
+    document.querySelectorAll('#blog-list [data-reveal]').forEach(el => el.classList.add('in'));
+  } catch (err) {
+    console.error(err);
+    loading.innerHTML = '<p style="color:#c0392b">불러오는 중 오류가 발생했습니다.</p>';
+  }
+})();
+
+// Language switching re-render
+document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => setTimeout(() => location.reload(), 50)));
+</script>
+</body>
+</html>

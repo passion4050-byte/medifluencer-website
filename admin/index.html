@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Admin · Medifluencer</title>
+<script src="../assets/supabase.js"></script>
+<script>
+// Route to inbox if authenticated, else login
+location.replace(SB.sbAuth.isAuthenticated() ? 'inbox.html' : 'login.html');
+</script>
+</head>
+<body></body>
+</html>

@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Edit Post · Medifluencer Admin</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <main class="admin-main">
+    <header class="admin-head">
+      <div>
+        <h1 id="pgTitle">새 글 작성</h1>
+        <p><a class="btn-link" href="posts.html">← Posts 목록으로</a></p>
+      </div>
+      <div class="actions">
+        <button class="btn-sec" id="previewBtn">미리보기</button>
+        <button class="btn-sec" id="draftBtn">초안 저장</button>
+        <button class="btn-pri" id="publishBtn">발행</button>
+      </div>
+    </header>
+
+    <div class="editor">
+      <section class="editor-main">
+        <div class="editor-field">
+          <label>슬러그 (URL)</label>
+          <input type="text" id="f-slug" placeholder="my-first-post (영문 소문자 + 하이픈)">
+        </div>
+
+        <div class="editor-row">
+          <div class="editor-field">
+            <label>제목 (한국어)</label>
+            <input type="text" id="f-title-ko">
+          </div>
+          <div class="editor-field">
+            <label>제목 (영문)</label>
+            <input type="text" id="f-title-en">
+          </div>
+        </div>
+
+        <div class="editor-row">
+          <div class="editor-field">
+            <label>요약 (한국어)</label>
+            <textarea id="f-excerpt-ko" style="min-height:80px"></textarea>
+          </div>
+          <div class="editor-field">
+            <label>요약 (영문)</label>
+            <textarea id="f-excerpt-en" style="min-height:80px"></textarea>
+          </div>
+        </div>
+
+        <div class="editor-field">
+          <label>본문 (한국어) · Markdown</label>
+          <textarea id="f-body-ko" class="body" placeholder="## 헤딩&#10;본문 내용...&#10;&#10;- 리스트&#10;- 항목&#10;&#10;**굵게** *기울임*"></textarea>
+        </div>
+
+        <div class="editor-field">
+          <label>본문 (영문) · Markdown</label>
+          <textarea id="f-body-en" class="body"></textarea>
+        </div>
+      </section>
+
+      <aside class="editor-aside">
+        <h6>발행 옵션</h6>
+
+        <div class="editor-field">
+          <label>상태</label>
+          <select id="f-status">
+            <option value="draft">draft (초안)</option>
+            <option value="published">published (발행)</option>
+            <option value="archived">archived (보관)</option>
+          </select>
+        </div>
+
+        <div class="editor-field">
+          <label>태그</label>
+          <select id="f-tag">
+            <option value="medical">medical</option>
+            <option value="methodology">methodology</option>
+            <option value="case">case</option>
+            <option value="announcement">announcement</option>
+            <option value="news">news</option>
+          </select>
+        </div>
+
+        <div class="editor-field">
+          <label>커버 이미지 URL</label>
+          <input type="url" id="f-cover" placeholder="https://...">
+        </div>
+
+        <div class="editor-field">
+          <label>발행일 (선택)</label>
+          <input type="datetime-local" id="f-publishedAt">
+        </div>
+
+        <button class="btn-pri" id="saveBtn">저장</button>
+        <button class="btn-danger" style="width:100%;margin-top:8px;display:none" id="deleteBtn">삭제</button>
+
+        <div class="meta" id="metaInfo">
+          작성일 —
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/supabase.js"></script>
+<script src="admin.js"></script>
+<script>
+MFAdmin.attachShell('posts');
+
+const id = new URLSearchParams(location.search).get('id');
+const F = id => document.getElementById(id);
+const isNew = !id;
+
+function slugify(s) {
+  return (s || '').toLowerCase()
+    .replace(/[^a-z0-9가-힣\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 80);
+}
+
+F('f-title-ko').addEventListener('blur', () => {
+  if (!F('f-slug').value) F('f-slug').value = slugify(F('f-title-ko').value);
+});
+
+if (!isNew) {
+  document.getElementById('pgTitle').textContent = '글 편집';
+  document.getElementById('deleteBtn').style.display = 'block';
+  loadPost();
+}
+
+async function loadPost() {
+  try {
+    const res = await SB.sbSelect('blog_posts', `?select=*&id=eq.${id}&limit=1`);
+    if (!res || !res.length) { alert('글을 찾을 수 없습니다'); location.href='posts.html'; return; }
+    const p = res[0];
+    F('f-slug').value = p.slug || '';
+    F('f-title-ko').value = p.title_ko || '';
+    F('f-title-en').value = p.title_en || '';
+    F('f-excerpt-ko').value = p.excerpt_ko || '';
+    F('f-excerpt-en').value = p.excerpt_en || '';
+    F('f-body-ko').value = p.body_ko || '';
+    F('f-body-en').value = p.body_en || '';
+    F('f-status').value = p.status || 'draft';
+    F('f-tag').value = p.tag || 'medical';
+    F('f-cover').value = p.cover_url || '';
+    if (p.published_at) {
+      const d = new Date(p.published_at);
+      const local = new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+      F('f-publishedAt').value = local;
+    }
+    document.getElementById('metaInfo').innerHTML = `
+      작성일: ${MFAdmin.fmtDate(p.created_at)}<br>
+      수정일: ${MFAdmin.fmtDate(p.updated_at)}<br>
+      ${p.published_at ? '발행일: ' + MFAdmin.fmtDate(p.published_at) : ''}
+    `;
+  } catch (e) { alert('불러오기 실패: ' + e.message); }
+}
+
+function collectPatch() {
+  const status = F('f-status').value;
+  let pubAt = F('f-publishedAt').value;
+  if (status === 'published' && !pubAt) {
+    pubAt = new Date().toISOString();
+  } else if (pubAt) {
+    pubAt = new Date(pubAt).toISOString();
+  } else {
+    pubAt = null;
+  }
+  return {
+    slug: F('f-slug').value.trim() || slugify(F('f-title-ko').value),
+    title_ko: F('f-title-ko').value.trim(),
+    title_en: F('f-title-en').value.trim() || null,
+    excerpt_ko: F('f-excerpt-ko').value.trim() || null,
+    excerpt_en: F('f-excerpt-en').value.trim() || null,
+    body_ko: F('f-body-ko').value || null,
+    body_en: F('f-body-en').value || null,
+    cover_url: F('f-cover').value.trim() || null,
+    tag: F('f-tag').value,
+    status,
+    published_at: pubAt,
+    author_email: MFAdmin.userEmail(),
+  };
+}
+
+async function save(status) {
+  if (!F('f-title-ko').value.trim()) { alert('제목(한국어)을 입력해주세요'); return; }
+  const data = collectPatch();
+  if (status) data.status = status;
+  try {
+    if (isNew) {
+      const res = await SB.sbInsert('blog_posts', data);
+      MFAdmin.toast('저장됨');
+      location.href = `post-edit.html?id=${res[0].id}`;
+    } else {
+      await SB.sbUpdate('blog_posts', `id=eq.${id}`, data);
+      MFAdmin.toast('저장됨');
+      if (status) loadPost();
+    }
+  } catch (e) {
+    alert('저장 실패: ' + e.message);
+  }
+}
+
+document.getElementById('saveBtn').onclick   = () => save(null);
+document.getElementById('draftBtn').onclick  = () => { F('f-status').value = 'draft'; save('draft'); };
+document.getElementById('publishBtn').onclick = () => { F('f-status').value = 'published'; save('published'); };
+document.getElementById('previewBtn').onclick = () => {
+  const slug = F('f-slug').value.trim();
+  if (!slug) { alert('미리보기 전에 슬러그가 필요합니다'); return; }
+  window.open(`../blog-post.html?slug=${encodeURIComponent(slug)}`, '_blank');
+};
+document.getElementById('deleteBtn').onclick = async () => {
+  if (!confirm('이 글을 삭제하시겠습니까? 복구할 수 없습니다.')) return;
+  try { await SB.sbDelete('blog_posts', `id=eq.${id}`); MFAdmin.toast('삭제됨'); setTimeout(()=>location.href='posts.html', 600); }
+  catch (e) { alert('삭제 실패: ' + e.message); }
+};
+</script>
+</body>
+</html>
