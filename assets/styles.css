@@ -1567,3 +1567,20 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, a:focus-visib
 @media (prefers-reduced-motion:reduce){
   .scroll-progress, .scroll-top, .nav-link::after, .tier:not(.featured)::before, .section-head h2::after{transition:none !important;animation:none !important}
 }
+
+
+/* ============================================
+   Google Translate UI suppression
+   ============================================ */
+.skiptranslate,
+.goog-te-banner-frame,
+.goog-te-gadget,
+.goog-te-balloon-frame,
+iframe.skiptranslate{display:none !important}
+body{top:0 !important;position:static !important}
+.goog-tooltip, .goog-tooltip:hover{display:none !important}
+.goog-text-highlight{background:none !important;box-shadow:none !important}
+#google_translate_element{position:absolute !important;top:-2000px !important;left:-2000px !important;visibility:hidden !important;pointer-events:none !important}
+
+/* Prevent translate from touching our hand-crafted EN content */
+[data-lang="en"], .notranslate{}

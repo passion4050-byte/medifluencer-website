@@ -1,8 +1,9 @@
-/* Medifluencer - main.js (safe mode v3) */
+/* Medifluencer - main.js (safe mode v4 + Google Translate) */
 (function () {
   'use strict';
   const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const COARSE = window.matchMedia('(pointer: coarse)').matches;
+  let gtReady = false;
 
   // ---- Language ----
   const SUPPORTED = ['ko','en'];
@@ -13,12 +14,64 @@
     document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
     const t = document.querySelector('title');
     if (t && t.dataset.ko && t.dataset.en) t.textContent = lang==='ko'? t.dataset.ko : t.dataset.en;
+    // Apply Google Translate as fallback for any KR text outside our [data-lang] system
+    triggerGoogleTranslate(lang);
   }
   function initLang(){
     let s=null; try{s=localStorage.getItem('mf_lang');}catch(e){}
     const init = s || (navigator.language && navigator.language.startsWith('en') ? 'en':'ko');
     setLang(init);
     document.querySelectorAll('.lang-btn').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+  }
+
+  // ---- Google Translate integration ----
+  function initGoogleTranslate(){
+    // Mark our hand-crafted EN content so GT doesn't re-translate it
+    document.querySelectorAll('[data-lang="en"], code, .mono, .brand-name, .brand-sub').forEach(el=>{
+      el.setAttribute('translate','no');
+      el.classList.add('notranslate');
+    });
+    // Create hidden container
+    if (!document.getElementById('google_translate_element')) {
+      const div = document.createElement('div');
+      div.id = 'google_translate_element';
+      div.style.cssText = 'position:absolute;top:-2000px;left:-2000px;visibility:hidden;pointer-events:none';
+      document.body.appendChild(div);
+    }
+    window.googleTranslateElementInit = function(){
+      try {
+        new google.translate.TranslateElement({
+          pageLanguage: 'ko',
+          includedLanguages: 'en',
+          autoDisplay: false,
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+        gtReady = true;
+        // Apply stored language if EN
+        const stored = (function(){try{return localStorage.getItem('mf_lang');}catch(e){return null;}})();
+        if (stored === 'en') triggerGoogleTranslate('en');
+      } catch(e) { console.warn('GT init failed', e); }
+    };
+    const s = document.createElement('script');
+    s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    s.async = true;
+    document.head.appendChild(s);
+  }
+
+  function triggerGoogleTranslate(lang){
+    const tryFire = (attempts=0) => {
+      const sel = document.querySelector('.goog-te-combo');
+      if (sel) {
+        const target = lang === 'en' ? 'en' : '';
+        if (sel.value !== target) {
+          sel.value = target;
+          sel.dispatchEvent(new Event('change'));
+        }
+      } else if (attempts < 25) {
+        setTimeout(()=>tryFire(attempts+1), 200);
+      }
+    };
+    tryFire();
   }
 
   // ---- Sticky header scrolled state ----
@@ -37,7 +90,7 @@
     n.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{t.classList.remove('open');n.classList.remove('open');}));
   }
 
-  // ---- Auto-stagger: add .stagger class + data-reveal to grid containers ----
+  // ---- Auto-stagger ----
   function initAutoStagger(){
     const sel = '.stages, .pillars, .value-grid, .ctype-grid, .bmodel-grid, .tier-grid, .cases, .diag-grid, .kpi-roadmap, .trust-grid, .track-row, .process';
     document.querySelectorAll(sel).forEach(g=>{
@@ -46,7 +99,7 @@
     });
   }
 
-  // ---- Reveal (SAFE: content visible by default, animation is decoration only) ----
+  // ---- Reveal (SAFE) ----
   function initReveal(){
     const els = document.querySelectorAll('[data-reveal]');
     if (!els.length) return;
@@ -56,24 +109,17 @@
     }
     const obs = new IntersectionObserver(entries=>{
       entries.forEach(e=>{
-        if(e.isIntersecting){
-          e.target.classList.add('in');
-          obs.unobserve(e.target);
-        }
+        if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); }
       });
     },{threshold:0.04, rootMargin:'0px 0px -30px 0px'});
     els.forEach(e=>obs.observe(e));
-
-    // Hero/page-hero/product-hero items become .in immediately on load
     document.querySelectorAll('.hero [data-reveal], .page-hero [data-reveal], .product-hero [data-reveal]').forEach(el=>el.classList.add('in'));
-
-    // 800ms safety net — any [data-reveal] still not .in is forced visible
     setTimeout(()=>{
       document.querySelectorAll('[data-reveal]:not(.in)').forEach(el=>el.classList.add('in'));
     }, 800);
   }
 
-  // ---- Counter animation ----
+  // ---- Counter ----
   function animateNum(el){
     const tg = parseFloat(el.dataset.count); if (isNaN(tg)) return;
     const dur=1400, start=performance.now(), fmt=el.dataset.fmt||'int';
@@ -94,11 +140,10 @@
       entries.forEach(e=>{ if(e.isIntersecting){ animateNum(e.target); obs.unobserve(e.target); }});
     },{threshold:0.3});
     ns.forEach(n=>obs.observe(n));
-    // Hero counters fire immediately
     document.querySelectorAll('.hero [data-count], .product-hero [data-count]').forEach(n=>{ animateNum(n); obs.unobserve(n); });
   }
 
-  // ---- Contact form (Supabase insert) ----
+  // ---- Contact form ----
   function initForm(){
     const form = document.querySelector('form[data-contact]'); if(!form) return;
     form.addEventListener('submit', async (e) => {
@@ -128,7 +173,7 @@
     });
   }
 
-  // ---- Scroll-driven aurora drift ----
+  // ---- Scroll drift ----
   function initScrollDrift(){
     if (REDUCED) return;
     let ticking=false;
@@ -137,7 +182,7 @@
     up();
   }
 
-  // ---- Mouse-move aurora reactivity ----
+  // ---- Mouse-move aurora ----
   function initMouseMove(){
     if (REDUCED || COARSE) return;
     const heroes = document.querySelectorAll('.hero, .product-hero, .page-hero');
@@ -164,7 +209,7 @@
     });
   }
 
-  // ---- Cursor follower (soft gold halo) ----
+  // ---- Cursor follow ----
   function initCursorFollow(){
     if (REDUCED || COARSE) return;
     if (window.innerWidth < 980) return;
@@ -183,7 +228,7 @@
     loop();
   }
 
-  // ---- Scroll progress bar at top ----
+  // ---- Scroll progress bar ----
   function initScrollProgress(){
     if (REDUCED) return;
     const bar = document.createElement('div');
@@ -201,7 +246,7 @@
     update();
   }
 
-  // ---- Floating scroll-to-top button ----
+  // ---- Scroll-to-top ----
   function initScrollTop(){
     const btn = document.createElement('button');
     btn.className = 'scroll-top';
@@ -214,7 +259,7 @@
     update();
   }
 
-  // ---- Section heading underline reveal (decorative) ----
+  // ---- Heading underline reveal ----
   function initHeadingUnderline(){
     if (!('IntersectionObserver' in window)) return;
     const heads = document.querySelectorAll('.section-head');
@@ -226,6 +271,7 @@
   }
 
   function start(){
+    initGoogleTranslate();
     initLang();
     initHeader();
     initMenu();
