@@ -270,43 +270,44 @@
     heads.forEach(h=>obs.observe(h));
   }
 
-  // ---- Page transition + nav prefetch (smoother PC navigation) ----
+  // ---- Page transition (no-op — handled by CSS keyframe directly) ----
   function initPageTransition(){
-    if (REDUCED) return;
-    // Add a fade-in on page load so hard cuts feel soft
-    document.body.classList.add('page-loaded');
-    // On nav link click, fade out before navigating
-    document.querySelectorAll('a[href$=".html"]').forEach(a => {
-      // Skip external, same-page anchors, mailto, etc
-      const href = a.getAttribute('href');
-      if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto') || a.target === '_blank') return;
-      a.addEventListener('click', (e) => {
-        // Allow modifier-click for new tab
-        if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
-        e.preventDefault();
-        document.body.classList.add('page-leaving');
-        setTimeout(() => { window.location.href = href; }, 180);
-      });
-    });
+    // Body is opacity:1 by default + CSS pageEnter animation.
+    // Navigation feels instant via Speculation Rules API prerender.
   }
 
-  // ---- Nav prefetch on hover — pre-fetches HTML before click ----
+  // ---- Nav prefetch + prerender on hover (modern Chrome instant) ----
   function initNavPrefetch(){
-    if (COARSE) return; // mobile = no hover
-    const prefetched = new Set();
+    if (COARSE) return;
+    const seen = new Set();
+
+    // Speculation Rules API — full prerender (Chrome 109+)
+    if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
+      const rules = document.createElement('script');
+      rules.type = 'speculationrules';
+      rules.textContent = JSON.stringify({
+        prerender: [{ source: 'document', where: { href_matches: '/*.html' }, eagerness: 'moderate' }],
+        prefetch:  [{ source: 'document', where: { href_matches: '/*.html' }, eagerness: 'eager' }]
+      });
+      try { document.head.appendChild(rules); } catch(e) {}
+    }
+
+    // Classic prefetch fallback — works on Firefox/Safari too
     const prefetch = (url) => {
-      if (prefetched.has(url)) return;
-      prefetched.add(url);
+      if (seen.has(url)) return;
+      seen.add(url);
       const link = document.createElement('link');
       link.rel = 'prefetch';
       link.href = url;
       link.as = 'document';
       document.head.appendChild(link);
     };
-    document.querySelectorAll('.nav-link, a.btn, a.news-card, a.news-featured').forEach(a => {
+    document.querySelectorAll('.nav-link, a.btn, a.news-card, a.news-featured, a.brand').forEach(a => {
       const href = a.getAttribute('href');
       if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto')) return;
-      a.addEventListener('mouseenter', () => prefetch(href), { once: false, passive: true });
+      a.addEventListener('mouseenter', () => prefetch(href), { passive: true });
+      a.addEventListener('touchstart', () => prefetch(href), { passive: true });
+      a.addEventListener('focus', () => prefetch(href), { passive: true });
     });
   }
 

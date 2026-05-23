@@ -2252,28 +2252,22 @@ p + .btn, p + a.btn, p + .cta-row{margin-top:14px}
 
 
 /* ============================================
-   PAGE TRANSITION · v13
-   - Soft fade between pages so PC nav feels instant, not "hard"
+   PAGE TRANSITION · v15 — INSTANT NAVIGATION
+   - Speculation Rules API prerenders next page on hover
+   - No fade-in delay — content shows immediately on arrival
+   - Faster than any transition could simulate
    ============================================ */
-body{
-  opacity:0;
-  transition:opacity .35s cubic-bezier(.2,.8,.2,1);
-}
-body.page-loaded{opacity:1}
-body.page-leaving{opacity:0;transition-duration:.18s}
+body{opacity:1}
 
-/* Nav link hover — slightly faster feedback */
-.nav-link{transition:color .15s ease, background .15s ease}
+/* Nav link hover — instant feedback */
+.nav-link{transition:color .12s ease, background .12s ease}
 .nav-link:active{transform:translateY(1px)}
 
-@media (prefers-reduced-motion: reduce){
-  body{opacity:1 !important;transition:none !important}
-  body.page-leaving{opacity:1 !important}
+/* Optional micro fade-in for elegance (very short, non-blocking) */
+@keyframes pageEnter{from{opacity:.92}to{opacity:1}}
+@media (prefers-reduced-motion: no-preference){
+  body{animation:pageEnter .12s ease-out both}
 }
-
-/* Safety: if JS fails to add page-loaded, content still shows */
-@keyframes pageLoadFallback{to{opacity:1}}
-body{animation:pageLoadFallback 1.5s linear 1s forwards}
 
 
 /* ============================================
