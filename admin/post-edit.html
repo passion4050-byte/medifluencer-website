@@ -13,7 +13,7 @@
       <div>
         <h1 id="pgTitle">새 글 작성</h1>
         <p>
-          <a class="btn-link" href="posts.html">← Posts 목록으로</a>
+          <a class="btn-link" href="/admin/posts.html">← Posts 목록으로</a>
           <span class="autosave" id="autosaveInd" style="margin-left:14px"><span class="dot"></span><span class="label">아직 저장 안 됨</span></span>
         </p>
       </div>
@@ -221,7 +221,7 @@ if (!isNew) {
 async function loadPost() {
   try {
     const res = await SB.sbSelect('blog_posts', `?select=*&id=eq.${id}&limit=1`);
-    if (!res || !res.length) { alert('글을 찾을 수 없습니다'); location.href='posts.html'; return; }
+    if (!res || !res.length) { alert('글을 찾을 수 없습니다'); location.href='/admin/posts.html'; return; }
     const p = res[0];
     F('f-slug').value = p.slug || '';
     F('f-title-ko').value = p.title_ko || '';
@@ -307,7 +307,7 @@ async function save(targetStatus) {
       const res = await SB.sbInsert('blog_posts', data);
       autosaver.clear();
       MFAdmin.toast('저장됨');
-      location.href = `post-edit.html?id=${res[0].id}`;
+      location.href = `/admin/post-edit.html?id=${res[0].id}`;
     } else {
       await SB.sbUpdate('blog_posts', `id=eq.${id}`, data);
       autosaver.clear();
@@ -335,7 +335,7 @@ document.getElementById('deleteBtn').onclick = async () => {
     await SB.sbDelete('blog_posts', `id=eq.${id}`);
     autosaver.clear();
     MFAdmin.toast('삭제됨');
-    setTimeout(()=>location.href='posts.html', 600);
+    setTimeout(()=>location.href='/admin/posts.html', 600);
   } catch (e) { MFAdmin.toast('삭제 실패: ' + e.message, {error:true}); }
 };
 

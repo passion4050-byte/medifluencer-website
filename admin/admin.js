@@ -10,7 +10,7 @@
     if (!SB.sbAuth.isAuthenticated()) {
       // Avoid redirect loops if we're already on login
       if (!/login(\.html)?$/.test(location.pathname)) {
-        location.replace('login.html');
+        location.replace('/admin/login.html');
       }
       throw new Error('redirecting');
     }
@@ -72,9 +72,9 @@
   // ------- Shell (sidebar + mobile topbar) -------
   function buildSidebar(active) {
     const nav = [
-      { key:'inbox',    href:'inbox.html',    label:'Inbox',    svg:'<path d="M3 7l9 6 9-6M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7"/>' },
-      { key:'posts',    href:'posts.html',    label:'Posts',    svg:'<path d="M4 4h16v16H4z"/><path d="M4 9h16M9 4v16"/>' },
-      { key:'settings', href:'settings.html', label:'Settings', svg:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 005.6 15a1.65 1.65 0 00-1.51-1H4a2 2 0 110-4h.09A1.65 1.65 0 005.6 9 1.65 1.65 0 005.27 7.18l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.13.31.33.6.58.85a1.65 1.65 0 001.42.51H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/>' },
+      { key:'inbox',    href:'/admin/inbox.html',    label:'Inbox',    svg:'<path d="M3 7l9 6 9-6M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7"/>' },
+      { key:'posts',    href:'/admin/posts.html',    label:'Posts',    svg:'<path d="M4 4h16v16H4z"/><path d="M4 9h16M9 4v16"/>' },
+      { key:'settings', href:'/admin/settings.html', label:'Settings', svg:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 005.6 15a1.65 1.65 0 00-1.51-1H4a2 2 0 110-4h.09A1.65 1.65 0 005.6 9 1.65 1.65 0 005.27 7.18l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.13.31.33.6.58.85a1.65 1.65 0 001.42.51H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/>' },
     ];
     const items = nav.map(n => `
       <a href="${n.href}" class="${active === n.key ? 'active':''}" data-nav="${n.key}">
@@ -85,11 +85,11 @@
 
     return `
 <aside class="admin-side" id="adminSide">
-  <a class="brand" href="inbox.html">
+  <a class="brand" href="/admin/inbox.html">
     <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M5 5h2.6l3.4 8 3.4-8H17v14h-2.1V9.3L11.6 19h-1.2L7.1 9.3V19H5z" fill="#B89567"/></svg></span>
     <span class="brand-text"><strong>Medifluencer</strong><small>Admin</small></span>
   </a>
-  <a class="quick-site" href="../index.html" target="_blank" rel="noopener">
+  <a class="quick-site" href="/" target="_blank" rel="noopener">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
     <span>메인 사이트 보기</span>
   </a>
@@ -109,7 +109,7 @@
   function buildTopbar() {
     return `
 <div class="mobile-topbar">
-  <a class="brand" href="inbox.html">
+  <a class="brand" href="/admin/inbox.html">
     <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M5 5h2.6l3.4 8 3.4-8H17v14h-2.1V9.3L11.6 19h-1.2L7.1 9.3V19H5z" fill="#B89567"/></svg></span>
     <span class="brand-text">Medifluencer<small>Admin</small></span>
   </a>
@@ -138,7 +138,7 @@
     // Sign out
     document.getElementById('signoutBtn').addEventListener('click', async () => {
       try { await SB.sbAuth.signOut(); } catch(e) {}
-      location.href = 'login.html';
+      location.href = '/admin/login.html';
     });
 
     // Hamburger toggle

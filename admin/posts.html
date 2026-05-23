@@ -19,7 +19,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
           새로고침
         </button>
-        <a href="post-edit.html" class="btn-pri">
+        <a href="/admin/post-edit.html" class="btn-pri">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
           새 글 작성
         </a>
@@ -117,7 +117,7 @@ function render() {
 
   if (!filtered.length) {
     tbody.innerHTML = allRows.length === 0
-      ? `<tr><td colspan="5" class="empty"><strong>아직 글이 없습니다</strong><a class="btn-link" href="post-edit.html">첫 글을 작성하세요 →</a></td></tr>`
+      ? `<tr><td colspan="5" class="empty"><strong>아직 글이 없습니다</strong><a class="btn-link" href="/admin/post-edit.html">첫 글을 작성하세요 →</a></td></tr>`
       : `<tr><td colspan="5" class="empty"><strong>조건에 맞는 글이 없습니다</strong>검색어나 필터를 조정해보세요.</td></tr>`;
     return;
   }
@@ -136,8 +136,8 @@ function render() {
       <td>${statusDisplay}</td>
       <td style="font-size:12.5px;color:#64748B" title="${r.published_at ? MFAdmin.fmtDate(r.published_at) : '—'}">${r.published_at ? MFAdmin.fmtDateShort(r.published_at) : '—'}</td>
       <td>
-        <a class="btn-link" href="post-edit.html?id=${r.id}">편집</a>
-        ${r.status === 'published' && !isScheduled ? `<a class="btn-link" target="_blank" rel="noopener" href="../blog-post.html?slug=${encodeURIComponent(r.slug)}" style="margin-left:10px">미리보기 ↗</a>` : ''}
+        <a class="btn-link" href="/admin/post-edit.html?id=${r.id}">편집</a>
+        ${r.status === 'published' && !isScheduled ? `<a class="btn-link" target="_blank" rel="noopener" href="/blog-post.html?slug=${encodeURIComponent(r.slug)}" style="margin-left:10px">미리보기 ↗</a>` : ''}
       </td>
     </tr>`;
   }).join('');
@@ -146,7 +146,7 @@ function render() {
   tbody.querySelectorAll('tr[data-id]').forEach(tr => {
     tr.addEventListener('click', (e) => {
       if (e.target.tagName === 'A') return;
-      location.href = `post-edit.html?id=${tr.dataset.id}`;
+      location.href = `/admin/post-edit.html?id=${tr.dataset.id}`;
     });
   });
 }

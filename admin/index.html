@@ -5,8 +5,10 @@
 <title>Admin · Medifluencer</title>
 <script src="../assets/supabase.js"></script>
 <script>
-// Route to inbox if authenticated, else login
-location.replace(SB.sbAuth.isAuthenticated() ? 'inbox.html' : 'login.html');
+// Route to inbox if authenticated, else login.
+// Use ABSOLUTE paths because vercel cleanUrls + trailingSlash:false makes
+// relative paths resolve against /admin (without slash), which leaks to /inbox.
+location.replace(SB.sbAuth.isAuthenticated() ? '/admin/inbox.html' : '/admin/login.html');
 </script>
 </head>
 <body></body>
